@@ -11,6 +11,9 @@ from pdfminer.layout import LAParams
 from pdfminer.image import ImageWriter
 
 
+"""
+Prints how the tool should be used.
+"""
 def usage():
     print(f'usage: pdf2txt.py [-P password] [-o output] [-t text|html|xml|tag]'
           ' [-O output_dir] [-c encoding] [-s scale] [-R rotation]'
@@ -20,6 +23,10 @@ def usage():
     return 100
 
 
+"""
+Extracts the commandline arguments and declares them to independant variables
+and calls pdfconversion with the corresponding arguments
+"""
 def commandline(argv):
     import getopt
 
@@ -100,6 +107,9 @@ def commandline(argv):
                   caching, laparams, debug)
 
 
+"""
+Converts pdf to specified output format and filetype.
+"""
 def pdfconversion(args, password, pagenos, maxpages, outfile, outtype, imagewriter,
                   rotation, stripcontrol, layoutmode, encoding, scale,
                   caching, laparams, debug):
