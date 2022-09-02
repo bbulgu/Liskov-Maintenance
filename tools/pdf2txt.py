@@ -10,21 +10,21 @@ from pdfminer.cmapdb import CMapDB
 from pdfminer.layout import LAParams
 from pdfminer.image import ImageWriter
 
-# main
-def main(argv):
+def commandline(argv):
     import getopt
     def usage():
         print(f'usage: {argv[0]} [-P password] [-o output] [-t text|html|xml|tag]'
-               ' [-O output_dir] [-c encoding] [-s scale] [-R rotation]'
-               ' [-Y normal|loose|exact] [-p pagenos] [-m maxpages]'
-               ' [-S] [-C] [-n] [-A] [-V] [-M char_margin] [-L line_margin]'
-               ' [-W word_margin] [-F boxes_flow] [-d] input.pdf ...')
+                ' [-O output_dir] [-c encoding] [-s scale] [-R rotation]'
+                ' [-Y normal|loose|exact] [-p pagenos] [-m maxpages]'
+                ' [-S] [-C] [-n] [-A] [-V] [-M char_margin] [-L line_margin]'
+                ' [-W word_margin] [-F boxes_flow] [-d] input.pdf ...')
         return 100
     try:
         (opts, args) = getopt.getopt(argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SCnAVM:W:L:F:')
     except getopt.GetoptError:
         return usage()
     if not args: return usage()
+
     # debug option
     debug = 0
     # input option
@@ -39,11 +39,10 @@ def main(argv):
     stripcontrol = False
     layoutmode = 'normal'
     encoding = 'utf-8'
-    pageno = 1
     scale = 1
     caching = True
-    showpageno = True
     laparams = LAParams()
+
     for (k, v) in opts:
         if k == '-d': debug += 1
         elif k == '-P': password = v.encode('ascii')
@@ -71,6 +70,13 @@ def main(argv):
     CMapDB.debug = debug
     PDFPageInterpreter.debug = debug
     #
+    pdfconversion(password, pagenos, maxpages, outfile, outtype, imagewriter,
+            rotation, stripcontrol, layoutmode, encoding, scale,
+            caching)
+
+def pdfconversion(password, pagenos, maxpages, outfile, outtype, imagewriter,
+            rotation, stripcontrol, layoutmode, encoding, scale,
+            caching):
     rsrcmgr = PDFResourceManager(caching=caching)
     if not outtype:
         outtype = 'text'
@@ -87,15 +93,15 @@ def main(argv):
         outfp = sys.stdout
     if outtype == 'text':
         device = TextConverter(rsrcmgr, outfp, laparams=laparams,
-                               imagewriter=imagewriter)
+                imagewriter=imagewriter)
     elif outtype == 'xml':
         device = XMLConverter(rsrcmgr, outfp, laparams=laparams,
-                              imagewriter=imagewriter,
-                              stripcontrol=stripcontrol)
+                imagewriter=imagewriter,
+                stripcontrol=stripcontrol)
     elif outtype == 'html':
         device = HTMLConverter(rsrcmgr, outfp, scale=scale,
-                               layoutmode=layoutmode, laparams=laparams,
-                               imagewriter=imagewriter, debug=debug)
+                layoutmode=layoutmode, laparams=laparams,
+                imagewriter=imagewriter, debug=debug)
     elif outtype == 'tag':
         device = TagExtractor(rsrcmgr, outfp)
     else:
@@ -104,12 +110,18 @@ def main(argv):
         with open(fname, 'rb') as fp:
             interpreter = PDFPageInterpreter(rsrcmgr, device)
             for page in PDFPage.get_pages(fp, pagenos,
-                                          maxpages=maxpages, password=password,
-                                          caching=caching, check_extractable=True):
+                    maxpages=maxpages, password=password,
+                    caching=caching, check_extractable=True):
                 page.rotate = (page.rotate+rotation) % 360
                 interpreter.process_page(page)
     device.close()
     outfp.close()
     return
+
+# main
+def main(argv):
+    commandline(argv)
+
+
 
 if __name__ == '__main__': sys.exit(main(sys.argv))
