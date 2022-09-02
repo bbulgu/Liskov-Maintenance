@@ -201,10 +201,12 @@ class PDFStream(PDFObject):
     def __repr__(self):
         if self.data is None:
             assert self.rawdata is not None
-            return '<PDFStream(%r): raw=%d, %r>' % (self.objid, len(self.rawdata), self.attrs)
+            return '<PDFStream(%r): raw=%d, %r>' % (
+                self.objid, len(self.rawdata), self.attrs)
         else:
             assert self.data is not None
-            return '<PDFStream(%r): len=%d, %r>' % (self.objid, len(self.data), self.attrs)
+            return '<PDFStream(%r): len=%d, %r>' % (
+                self.objid, len(self.data), self.attrs)
 
     def __contains__(self, name):
         return name in self.attrs
@@ -230,7 +232,7 @@ class PDFStream(PDFObject):
             filters = [filters]
         if not isinstance(params, list):
             # Make sure the parameters list is the same as filters.
-            params = [params]*len(filters)
+            params = [params] * len(filters)
         if STRICT and len(params) != len(filters):
             raise PDFException("Parameters len filter mismatch")
         return zip(filters, params)

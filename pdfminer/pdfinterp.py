@@ -241,7 +241,7 @@ class PDFContentParser(PSStackParser):
     def fillbuf(self):
         if self.charpos < len(self.buf):
             return
-        while 1:
+        while True:
             self.fillfp()
             self.bufpos = self.fp.tell()
             self.buf = self.fp.read(self.BUFSIZ)
@@ -258,12 +258,12 @@ class PDFContentParser(PSStackParser):
         while i <= len(target):
             self.fillbuf()
             if i:
-                c = self.buf[self.charpos:self.charpos+1]
+                c = self.buf[self.charpos:self.charpos + 1]
                 data += c
                 self.charpos += 1
                 if len(target) <= i and c.isspace():
                     i += 1
-                elif i < len(target) and c == target[i:i+1]:
+                elif i < len(target) and c == target[i:i + 1]:
                     i += 1
                 else:
                     i = 0
@@ -271,13 +271,13 @@ class PDFContentParser(PSStackParser):
                 try:
                     j = self.buf.index(target[0], self.charpos)
                     #print('found', (0, self.buf[j:j+10]))
-                    data += self.buf[self.charpos:j+1]
-                    self.charpos = j+1
+                    data += self.buf[self.charpos:j + 1]
+                    self.charpos = j + 1
                     i = 1
                 except ValueError:
                     data += self.buf[self.charpos:]
                     self.charpos = len(self.buf)
-        data = data[:-(len(target)+1)]  # strip the last part
+        data = data[:-(len(target) + 1)]  # strip the last part
         data = re.sub(br'(\x0d\x0a|[\x0d\x0a])$', b'', data)
         return (pos, data)
 
@@ -300,7 +300,7 @@ class PDFContentParser(PSStackParser):
                     raise PSTypeError(
                         'Invalid dictionary construct: %r' % objs)
                 d = dict((literal_name(k), v) for (k, v) in choplist(2, objs))
-                (pos, data) = self.get_inline_data(pos+len(b'ID '))
+                (pos, data) = self.get_inline_data(pos + len(b'ID '))
                 obj = PDFStream(d, data)
                 self.push((pos, obj))
                 self.push((pos, self.KEYWORD_EI))
@@ -341,7 +341,8 @@ class PDFPageInterpreter:
                 name = literal_name(spec[0])
             else:
                 name = literal_name(spec)
-            if name == 'ICCBased' and isinstance(spec, list) and 2 <= len(spec):
+            if name == 'ICCBased' and isinstance(
+                    spec, list) and 2 <= len(spec):
                 return PDFColorSpace(name, stream_value(spec[1])['N'])
             elif name == 'DeviceN' and isinstance(spec, list) and 2 <= len(spec):
                 return PDFColorSpace(name, len(list_value(spec[1])))
@@ -496,9 +497,9 @@ class PDFPageInterpreter:
     # rectangle
     def do_re(self, x, y, w, h):
         self.curpath.append(('m', x, y))
-        self.curpath.append(('l', x+w, y))
-        self.curpath.append(('l', x+w, y+h))
-        self.curpath.append(('l', x, y+h))
+        self.curpath.append(('l', x + w, y))
+        self.curpath.append(('l', x + w, y + h))
+        self.curpath.append(('l', x, y + h))
         self.curpath.append(('h',))
         return
 
@@ -733,7 +734,8 @@ class PDFPageInterpreter:
     # text-move
     def do_Td(self, tx, ty):
         (a, b, c, d, e, f) = self.textstate.matrix
-        self.textstate.matrix = (a, b, c, d, tx*a+ty*c+e, tx*b+ty*d+f)
+        self.textstate.matrix = (
+            a, b, c, d, tx * a + ty * c + e, tx * b + ty * d + f)
         self.textstate.linematrix = (0, 0)
         #print('Td(%r,%r): %r' % (tx, ty, self.textstate), file=sys.stderr)
         return
@@ -741,7 +743,8 @@ class PDFPageInterpreter:
     # text-move
     def do_TD(self, tx, ty):
         (a, b, c, d, e, f) = self.textstate.matrix
-        self.textstate.matrix = (a, b, c, d, tx*a+ty*c+e, tx*b+ty*d+f)
+        self.textstate.matrix = (
+            a, b, c, d, tx * a + ty * c + e, tx * b + ty * d + f)
         self.textstate.leading = ty
         self.textstate.linematrix = (0, 0)
         #print('TD(%r,%r): %r' % (tx, ty, self.textstate), file=sys.stderr)
@@ -757,7 +760,7 @@ class PDFPageInterpreter:
     def do_T_a(self):
         (a, b, c, d, e, f) = self.textstate.matrix
         self.textstate.matrix = (
-            a, b, c, d, self.textstate.leading*c+e, self.textstate.leading*d+f)
+            a, b, c, d, self.textstate.leading * c + e, self.textstate.leading * d + f)
         self.textstate.linematrix = (0, 0)
         return
 
@@ -873,7 +876,7 @@ class PDFPageInterpreter:
         except PSEOF:
             # empty page
             return
-        while 1:
+        while True:
             try:
                 (_, obj) = parser.nextobject()
             except PSEOF:
@@ -884,7 +887,7 @@ class PDFPageInterpreter:
                     '*', '_a').replace('"', '_w').replace("'", '_q')
                 if hasattr(self, method):
                     func = getattr(self, method)
-                    nargs = func.__code__.co_argcount-1
+                    nargs = func.__code__.co_argcount - 1
                     if nargs:
                         args = self.pop(nargs)
                         if self.debug:

@@ -17,7 +17,8 @@ class PDFColorSpace:
         return
 
     def __repr__(self):
-        return '<PDFColorSpace: %s, ncomponents=%d>' % (self.name, self.ncomponents)
+        return '<PDFColorSpace: %s, ncomponents=%d>' % (
+            self.name, self.ncomponents)
 
 
 PREDEFINED_COLORSPACE = dict(

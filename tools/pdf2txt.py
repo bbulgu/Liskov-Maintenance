@@ -69,7 +69,7 @@ def main(argv):
         elif k == '-Y':
             layoutmode = v
         elif k == '-p':
-            pagenos.update(int(x)-1 for x in v.split(','))
+            pagenos.update(int(x) - 1 for x in v.split(','))
         elif k == '-m':
             maxpages = int(v)
         elif k == '-S':
@@ -131,7 +131,7 @@ def main(argv):
             for page in PDFPage.get_pages(fp, pagenos,
                                           maxpages=maxpages, password=password,
                                           caching=caching, check_extractable=True):
-                page.rotate = (page.rotate+rotation) % 360
+                page.rotate = (page.rotate + rotation) % 360
                 interpreter.process_page(page)
     device.close()
     outfp.close()

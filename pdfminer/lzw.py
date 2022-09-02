@@ -21,21 +21,27 @@ class LZWDecoder:
 
     def readbits(self, bits):
         v = 0
-        while 1:
+        while True:
             # the number of remaining bits we can get from the current buffer.
-            r = 8-self.bpos
+            r = 8 - self.bpos
             if bits <= r:
                 # |-----8-bits-----|
                 # |-bpos-|-bits-|  |
                 # |      |----r----|
-                v = (v << bits) | ((self.buff >> (r-bits)) & ((1 << bits)-1))
+                v = (
+                    v << bits) | (
+                    (self.buff >> (
+                        r -
+                        bits)) & (
+                        (1 << bits) -
+                        1))
                 self.bpos += bits
                 break
             else:
                 # |-----8-bits-----|
                 # |-bpos-|---bits----...
                 # |      |----r----|
-                v = (v << r) | (self.buff & ((1 << r)-1))
+                v = (v << r) | (self.buff & ((1 << r) - 1))
                 bits -= r
                 x = self.fp.read(1)
                 if not x:
@@ -59,9 +65,9 @@ class LZWDecoder:
         else:
             if code < len(self.table):
                 x = self.table[code]
-                self.table.append(self.prevbuf+x[:1])
+                self.table.append(self.prevbuf + x[:1])
             elif code == len(self.table):
-                self.table.append(self.prevbuf+self.prevbuf[:1])
+                self.table.append(self.prevbuf + self.prevbuf[:1])
                 x = self.table[code]
             else:
                 raise CorruptDataError
@@ -76,7 +82,7 @@ class LZWDecoder:
         return x
 
     def run(self):
-        while 1:
+        while True:
             try:
                 code = self.readbits(self.nbits)
             except EOFError:

@@ -106,7 +106,7 @@ class CMap(CMapBase):
             code2cid = self.code2cid
             code = ()
         for (k, v) in sorted(code2cid.items()):
-            c = code+(k,)
+            c = code + (k,)
             if isinstance(v, int):
                 out.write('code %r = cid %d\n' % (c, v))
             else:
@@ -119,7 +119,7 @@ class CMap(CMapBase):
 class IdentityCMap(CMapBase):
 
     def decode(self, code):
-        n = len(code)//2
+        n = len(code) // 2
         if n:
             return struct.unpack('>%dH' % n, code)
         else:
@@ -357,9 +357,9 @@ class CMapParser(PSStackParser):
                 e1 = nunpack(evar)
                 vlen = len(svar)
                 #assert s1 <= e1
-                for i in range(e1-s1+1):
-                    x = sprefix+struct.pack('>L', s1+i)[-vlen:]
-                    self.cmap.add_code2cid(x, cid+i)
+                for i in range(e1 - s1 + 1):
+                    x = sprefix + struct.pack('>L', s1 + i)[-vlen:]
+                    self.cmap.add_code2cid(x, cid + i)
             return
 
         if token is self.KEYWORD_BEGINCIDCHAR:
@@ -385,16 +385,16 @@ class CMapParser(PSStackParser):
                 e1 = nunpack(e)
                 #assert s1 <= e1
                 if isinstance(code, list):
-                    for i in range(e1-s1+1):
-                        self.cmap.add_cid2unichr(s1+i, code[i])
+                    for i in range(e1 - s1 + 1):
+                        self.cmap.add_cid2unichr(s1 + i, code[i])
                 else:
                     var = code[-4:]
                     base = nunpack(var)
                     prefix = code[:-4]
                     vlen = len(var)
-                    for i in range(e1-s1+1):
-                        x = prefix+struct.pack('>L', base+i)[-vlen:]
-                        self.cmap.add_cid2unichr(s1+i, x)
+                    for i in range(e1 - s1 + 1):
+                        x = prefix + struct.pack('>L', base + i)[-vlen:]
+                        self.cmap.add_cid2unichr(s1 + i, x)
             return
 
         if token is self.KEYWORD_BEGINBFCHAR:
@@ -439,7 +439,7 @@ class CMapConverter:
         elif enc == 'H':
             (hmapenc, vmapenc) = ('H', 'V')
         else:
-            (hmapenc, vmapenc) = (enc+'-H', enc+'-V')
+            (hmapenc, vmapenc) = (enc + '-H', enc + '-V')
         if hmapenc in self.code2cid:
             hmap = self.code2cid[hmapenc]
         else:
@@ -519,7 +519,7 @@ class CMapConverter:
                         code = code[:-1]
                     try:
                         code = codecs.decode(code, 'hex')
-                    except:
+                    except BaseException:
                         code = bytes([int(code, 16)])
                     if vertical:
                         vcodes.append(code)

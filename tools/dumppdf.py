@@ -159,7 +159,8 @@ def dumpoutline(outfp, fname, objids, pagenos, password=b'',
                     action = a.resolve()
                     if isinstance(action, dict):
                         subtype = action.get('S')
-                        if subtype and repr(subtype) == '/GoTo' and action.get('D'):
+                        if subtype and repr(
+                                subtype) == '/GoTo' and action.get('D'):
                             dest = resolve_dest(action['D'])
                             pageno = pages[dest[0].objid]
                 outfp.write('<outline level="%r" title="%s">\n' %
@@ -211,7 +212,8 @@ def extractembedded(outfp, fname, objids, pagenos, password=b'',
         for xref in doc.xrefs:
             for objid in xref.get_objids():
                 obj = doc.getobj(objid)
-                if isinstance(obj, dict) and obj.get('Type') is LITERAL_FILESPEC:
+                if isinstance(obj, dict) and obj.get(
+                        'Type') is LITERAL_FILESPEC:
                     extract1(obj)
     return
 
@@ -276,7 +278,7 @@ def main(argv):
         elif k == '-a':
             dumpall = True
         elif k == '-p':
-            pagenos.update(int(x)-1 for x in v.split(','))
+            pagenos.update(int(x) - 1 for x in v.split(','))
         elif k == '-i':
             objids.extend(int(x) for x in v.split(','))
         elif k == '-o':

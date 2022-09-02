@@ -13,9 +13,9 @@ def prof_main(argv):
     if len(args) < 1:
         return usage()
     name = args.pop(0)
-    prof = name+'.prof'
+    prof = name + '.prof'
     i = name.rindex('.')
-    (modname, funcname) = (name[:i], name[i+1:])
+    (modname, funcname) = (name[:i], name[i + 1:])
     module = __import__(modname, fromlist=1)
     func = getattr(module, funcname)
     if args:

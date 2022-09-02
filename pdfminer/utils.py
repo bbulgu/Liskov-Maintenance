@@ -13,14 +13,14 @@ def apply_png_predictor(pred, colors, columns, bitspercomponent, data):
         # unsupported
         raise ValueError(
             "Unsupported `bitspercomponent': %d" % bitspercomponent)
-    nbytes = colors*columns*bitspercomponent//8
+    nbytes = colors * columns * bitspercomponent // 8
     i = 0
     buf = b''
     line0 = b'\x00' * columns
-    for i in range(0, len(data), nbytes+1):
-        ft = data[i:i+1]
+    for i in range(0, len(data), nbytes + 1):
+        ft = data[i:i + 1]
         i += 1
-        line1 = data[i:i+nbytes]
+        line1 = data[i:i + nbytes]
         line2 = b''
         if ft == b'\x00':
             # PNG none
@@ -29,18 +29,18 @@ def apply_png_predictor(pred, colors, columns, bitspercomponent, data):
             # PNG sub (UNTESTED)
             c = 0
             for b in line1:
-                c = (c+b) & 255
+                c = (c + b) & 255
                 line2 += bytes([c])
         elif ft == b'\x02':
             # PNG up
             for (a, b) in zip(line0, line1):
-                c = (a+b) & 255
+                c = (a + b) & 255
                 line2 += bytes([c])
         elif ft == b'\x03':
             # PNG average (UNTESTED)
             c = 0
             for (a, b) in zip(line0, line1):
-                c = ((c+a+b)//2) & 255
+                c = ((c + a + b) // 2) & 255
                 line2 += bytes([c])
         else:
             # unsupported
@@ -59,30 +59,30 @@ def mult_matrix(m1, m0):
     (a1, b1, c1, d1, e1, f1) = m1
     (a0, b0, c0, d0, e0, f0) = m0
     """Returns the multiplication of two matrices."""
-    return (a0*a1+c0*b1,    b0*a1+d0*b1,
-            a0*c1+c0*d1,    b0*c1+d0*d1,
-            a0*e1+c0*f1+e0, b0*e1+d0*f1+f0)
+    return (a0 * a1 + c0 * b1, b0 * a1 + d0 * b1,
+            a0 * c1 + c0 * d1, b0 * c1 + d0 * d1,
+            a0 * e1 + c0 * f1 + e0, b0 * e1 + d0 * f1 + f0)
 
 
 def translate_matrix(m, v):
     """Translates a matrix by (x, y)."""
     (a, b, c, d, e, f) = m
     (x, y) = v
-    return (a, b, c, d, x*a+y*c+e, x*b+y*d+f)
+    return (a, b, c, d, x * a + y * c + e, x * b + y * d + f)
 
 
 def apply_matrix_pt(m, v):
     (a, b, c, d, e, f) = m
     (x, y) = v
     """Applies a matrix to a point."""
-    return (a*x+c*y+e, b*x+d*y+f)
+    return (a * x + c * y + e, b * x + d * y + f)
 
 
 def apply_matrix_norm(m, v):
     """Equivalent to apply_matrix_pt(M, (p,q)) - apply_matrix_pt(M, (0,0))"""
     (a, b, c, d, e, f) = m
     (p, q) = v
-    return (a*p+c*q, b*p+d*q)
+    return (a * p + c * q, b * p + d * q)
 
 
 # Utility functions
@@ -130,7 +130,7 @@ def fsplit(pred, objs):
 def drange(v0, v1, d):
     """Returns a discrete range."""
     assert v0 < v1
-    return range(int(v0)//d, int(v1+d)//d)
+    return range(int(v0) // d, int(v1 + d) // d)
 
 
 # get_bound
@@ -179,7 +179,7 @@ def nunpack(s, default=0):
     elif l == 2:
         return struct.unpack('>H', s)[0]
     elif l == 3:
-        return struct.unpack('>L', b'\x00'+s)[0]
+        return struct.unpack('>L', b'\x00' + s)[0]
     elif l == 4:
         return struct.unpack('>L', s)[0]
     else:

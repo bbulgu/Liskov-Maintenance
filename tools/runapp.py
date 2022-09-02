@@ -30,7 +30,7 @@ class WebAppHandler(SimpleHTTPRequestHandler):
         rest = self.path
         i = rest.rfind('?')
         if i >= 0:
-            rest, query = rest[:i], rest[i+1:]
+            rest, query = rest[:i], rest[i + 1:]
         else:
             query = ''
         i = rest.find('/')

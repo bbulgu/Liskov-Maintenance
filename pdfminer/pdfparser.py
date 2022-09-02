@@ -101,8 +101,8 @@ class PDFParser(PSStackParser):
             pos += len(line)
             self.fp.seek(pos)
             data = self.fp.read(objlen)
-            self.seek(pos+objlen)
-            while 1:
+            self.seek(pos + objlen)
+            while True:
                 try:
                     (linepos, line) = self.nextline()
                 except PSEOF:
@@ -118,7 +118,7 @@ class PDFParser(PSStackParser):
                 objlen += len(line)
                 if self.fallback:
                     data += line
-            self.seek(pos+objlen)
+            self.seek(pos + objlen)
             # XXX limit objlen not to exceed object boundary
             if self.debug:
                 logging.debug('Stream: pos=%d, objlen=%d, dic=%r, data=%r...' %

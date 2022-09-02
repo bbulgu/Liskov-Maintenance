@@ -172,7 +172,8 @@ class PSBaseParser:
         return
 
     def __repr__(self):
-        return '<%s: %r, bufpos=%d>' % (self.__class__.__name__, self.fp, self.bufpos)
+        return '<%s: %r, bufpos=%d>' % (
+            self.__class__.__name__, self.fp, self.bufpos)
 
     def flush(self):
         return
@@ -182,12 +183,12 @@ class PSBaseParser:
         return
 
     def tell(self):
-        return self.bufpos+self.charpos
+        return self.bufpos + self.charpos
 
     def poll(self, pos=None, n=80):
         pos0 = self.fp.tell()
         if not pos:
-            pos = self.bufpos+self.charpos
+            pos = self.bufpos + self.charpos
         self.fp.seek(pos)
         logging.info('poll(%d): %r' % (pos, self.fp.read(n)))
         self.fp.seek(pos0)
@@ -227,10 +228,10 @@ class PSBaseParser:
         linebuf = b''
         linepos = self.bufpos + self.charpos
         eol = False
-        while 1:
+        while True:
             self.fillbuf()
             if eol:
-                c = self.buf[self.charpos:self.charpos+1]
+                c = self.buf[self.charpos:self.charpos + 1]
                 # handle b'\r\n'
                 if c == b'\n':
                     linebuf += c
@@ -261,17 +262,17 @@ class PSBaseParser:
         buf = b''
         while 0 < pos:
             prevpos = pos
-            pos = max(0, pos-self.BUFSIZ)
+            pos = max(0, pos - self.BUFSIZ)
             self.fp.seek(pos)
-            s = self.fp.read(prevpos-pos)
+            s = self.fp.read(prevpos - pos)
             if not s:
                 break
-            while 1:
+            while True:
                 n = max(s.rfind(b'\r'), s.rfind(b'\n'))
                 if n == -1:
                     buf = s + buf
                     break
-                yield s[n:]+buf
+                yield s[n:] + buf
                 s = s[:n]
                 buf = b''
         return
@@ -281,44 +282,44 @@ class PSBaseParser:
         if not m:
             return len(s)
         j = m.start(0)
-        c = s[j:j+1]
-        self._curtokenpos = self.bufpos+j
+        c = s[j:j + 1]
+        self._curtokenpos = self.bufpos + j
         if c == b'%':
             self._curtoken = b'%'
             self._parse1 = self._parse_comment
-            return j+1
+            return j + 1
         elif c == b'/':
             self._curtoken = b''
             self._parse1 = self._parse_literal
-            return j+1
+            return j + 1
         elif c in b'-+' or c.isdigit():
             self._curtoken = c
             self._parse1 = self._parse_number
-            return j+1
+            return j + 1
         elif c == b'.':
             self._curtoken = c
             self._parse1 = self._parse_float
-            return j+1
+            return j + 1
         elif c.isalpha():
             self._curtoken = c
             self._parse1 = self._parse_keyword
-            return j+1
+            return j + 1
         elif c == b'(':
             self._curtoken = b''
             self.paren = 1
             self._parse1 = self._parse_string
-            return j+1
+            return j + 1
         elif c == b'<':
             self._curtoken = b''
             self._parse1 = self._parse_wopen
-            return j+1
+            return j + 1
         elif c == b'>':
             self._curtoken = b''
             self._parse1 = self._parse_wclose
-            return j+1
+            return j + 1
         else:
             self._add_token(KWD(c))
-            return j+1
+            return j + 1
 
     def _add_token(self, obj):
         self._tokens.append((self._curtokenpos, obj))
@@ -343,11 +344,11 @@ class PSBaseParser:
             return len(s)
         j = m.start(0)
         self._curtoken += s[i:j]
-        c = s[j:j+1]
+        c = s[j:j + 1]
         if c == b'#':
             self.hex = b''
             self._parse1 = self._parse_literal_hex
-            return j+1
+            return j + 1
 
         try:
             # Try to interpret the token as a utf-8 string
@@ -362,10 +363,10 @@ class PSBaseParser:
         return j
 
     def _parse_literal_hex(self, s, i):
-        c = s[i:i+1]
+        c = s[i:i + 1]
         if HEX.match(c) and len(self.hex) < 2:
             self.hex += c
-            return i+1
+            return i + 1
         if self.hex:
             try:
                 self._curtoken += bytes([int(self.hex, 16)])
@@ -381,11 +382,11 @@ class PSBaseParser:
             return len(s)
         j = m.start(0)
         self._curtoken += s[i:j]
-        c = s[j:j+1]
+        c = s[j:j + 1]
         if c == b'.':
             self._curtoken += c
             self._parse1 = self._parse_float
-            return j+1
+            return j + 1
         try:
             self._add_token(int(self._curtoken))
         except ValueError:
@@ -431,29 +432,29 @@ class PSBaseParser:
             return len(s)
         j = m.start(0)
         self._curtoken += s[i:j]
-        c = s[j:j+1]
+        c = s[j:j + 1]
         if c == b'\\':
             self.oct = b''
             self._parse1 = self._parse_string_1
-            return j+1
+            return j + 1
         if c == b'(':
             self.paren += 1
             self._curtoken += c
-            return j+1
+            return j + 1
         if c == b')':
             self.paren -= 1
             if self.paren:  # WTF, they said balanced parens need no special treatment.
                 self._curtoken += c
-                return j+1
+                return j + 1
         self._add_token(self._curtoken)
         self._parse1 = self._parse_main
-        return j+1
+        return j + 1
 
     def _parse_string_1(self, s, i):
-        c = s[i:i+1]
+        c = s[i:i + 1]
         if OCT_STRING.match(c) and len(self.oct) < 3:
             self.oct += c
-            return i+1
+            return i + 1
         if self.oct:
             try:
                 self._curtoken += bytes([int(self.oct, 8)])
@@ -464,10 +465,10 @@ class PSBaseParser:
         if c in ESC_STRING:
             self._curtoken += ESC_STRING[c]
         self._parse1 = self._parse_string
-        return i+1
+        return i + 1
 
     def _parse_wopen(self, s, i):
-        c = s[i:i+1]
+        c = s[i:i + 1]
         if c == b'<':
             self._add_token(KEYWORD_DICT_BEGIN)
             self._parse1 = self._parse_main
@@ -477,7 +478,7 @@ class PSBaseParser:
         return i
 
     def _parse_wclose(self, s, i):
-        c = s[i:i+1]
+        c = s[i:i + 1]
         if c == b'>':
             self._add_token(KEYWORD_DICT_END)
             i += 1
@@ -695,7 +696,7 @@ func/a/b{(c)do*}def
         parser = MyParser(BytesIO(s))
         r = []
         try:
-            while 1:
+            while True:
                 r.append(parser.nexttoken())
         except PSEOF:
             pass
@@ -710,7 +711,7 @@ func/a/b{(c)do*}def
         parser = MyParser(BytesIO(s))
         r = []
         try:
-            while 1:
+            while True:
                 r.append(parser.nextobject())
         except PSEOF:
             pass

@@ -34,7 +34,7 @@ def ascii85decode(data):
     for c in data:
         if 33 <= c and c <= 117:  # b'!' <= c and c <= b'u'
             n += 1
-            b = b*85+(c-33)
+            b = b * 85 + (c - 33)
             if n == 5:
                 out += struct.pack('>L', b)
                 n = b = 0
@@ -43,9 +43,9 @@ def ascii85decode(data):
             out += b'\0\0\0\0'
         elif c == 126:  # b'~'
             if n:
-                for _ in range(5-n):
-                    b = b*85+84
-                out += struct.pack('>L', b)[:n-1]
+                for _ in range(5 - n):
+                    b = b * 85 + 84
+                out += struct.pack('>L', b)[:n - 1]
             break
     return out
 

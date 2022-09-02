@@ -99,7 +99,7 @@ class PDFXRef(PDFBaseXRef):
         return '<PDFXRef: offsets=%r>' % (self.offsets.keys())
 
     def load(self, parser):
-        while 1:
+        while True:
             try:
                 (pos, line) = parser.nextline()
                 if not line.strip():
@@ -120,7 +120,7 @@ class PDFXRef(PDFBaseXRef):
             except ValueError:
                 raise PDFNoValidXRef(
                     'Invalid line: %r: line=%r' % (parser, line))
-            for objid in range(start, start+nobjs):
+            for objid in range(start, start + nobjs):
                 try:
                     (_, line) = parser.nextline()
                 except PSEOF:
@@ -177,7 +177,7 @@ class PDFXRefFallback(PDFXRef):
 
     def load(self, parser):
         parser.seek(0)
-        while 1:
+        while True:
             try:
                 (pos, line) = parser.nextline()
             except PSEOF:
@@ -198,7 +198,8 @@ class PDFXRefFallback(PDFXRef):
             # expand ObjStm.
             parser.seek(pos)
             (_, obj) = parser.nextobject()
-            if isinstance(obj, PDFStream) and obj.get('Type') is LITERAL_OBJSTM:
+            if isinstance(obj, PDFStream) and obj.get(
+                    'Type') is LITERAL_OBJSTM:
                 stream = stream_value(obj)
                 try:
                     n = stream['N']
@@ -209,14 +210,14 @@ class PDFXRefFallback(PDFXRef):
                 parser1 = PDFStreamParser(stream.get_data())
                 objs = []
                 try:
-                    while 1:
+                    while True:
                         (_, obj) = parser1.nextobject()
                         objs.append(obj)
                 except PSEOF:
                     pass
-                n = min(n, len(objs)//2)
+                n = min(n, len(objs) // 2)
                 for index in range(n):
-                    objid1 = objs[index*2]
+                    objid1 = objs[index * 2]
                     self.offsets[objid1] = (objid, index, 0)
         return
 
@@ -242,7 +243,8 @@ class PDFXRefStream(PDFBaseXRef):
         (_, genno) = parser.nexttoken()  # ignored
         (_, kwd) = parser.nexttoken()
         (_, stream) = parser.nextobject()
-        if not isinstance(stream, PDFStream) or stream['Type'] is not LITERAL_XREF:
+        if not isinstance(
+                stream, PDFStream) or stream['Type'] is not LITERAL_XREF:
             raise PDFNoValidXRef('Invalid PDF stream spec.')
         size = stream['Size']
         index_array = stream.get('Index', (0, size))
@@ -251,7 +253,7 @@ class PDFXRefStream(PDFBaseXRef):
         self.ranges.extend(choplist(2, index_array))
         (self.fl1, self.fl2, self.fl3) = stream['W']
         self.data = stream.get_data()
-        self.entlen = self.fl1+self.fl2+self.fl3
+        self.entlen = self.fl1 + self.fl2 + self.fl3
         self.trailer = stream.attrs
         if self.debug:
             logging.info('xref stream: objid=%s, fields=%d,%d,%d' %
@@ -266,16 +268,16 @@ class PDFXRefStream(PDFBaseXRef):
         for (start, nobjs) in self.ranges:
             for i in range(nobjs):
                 offset = self.entlen * i
-                ent = self.data[offset:offset+self.entlen]
+                ent = self.data[offset:offset + self.entlen]
                 f1 = nunpack(ent[:self.fl1], 1)
                 if f1 == 1 or f1 == 2:
-                    yield start+i
+                    yield start + i
         return
 
     def get_pos(self, objid):
         index = 0
         for (start, nobjs) in self.ranges:
-            if start <= objid and objid < start+nobjs:
+            if start <= objid and objid < start + nobjs:
                 index += objid - start
                 break
             else:
@@ -283,10 +285,10 @@ class PDFXRefStream(PDFBaseXRef):
         else:
             raise KeyError(objid)
         offset = self.entlen * index
-        ent = self.data[offset:offset+self.entlen]
+        ent = self.data[offset:offset + self.entlen]
         f1 = nunpack(ent[:self.fl1], 1)
-        f2 = nunpack(ent[self.fl1:self.fl1+self.fl2])
-        f3 = nunpack(ent[self.fl1+self.fl2:])
+        f2 = nunpack(ent[self.fl1:self.fl1 + self.fl2])
+        f3 = nunpack(ent[self.fl1 + self.fl2:])
         if f1 == 1:
             return (None, f2, f3)
         elif f1 == 2:
@@ -515,17 +517,20 @@ class PDFStandardSecurityHandlerV5(PDFStandardSecurityHandlerV4):
             hash = SHA256.new(password)
             hash.update(self.o_key_salt)
             hash.update(self.u)
-            return AES.new(hash.digest(), mode=AES.MODE_CBC, IV=b'\x00' * 16).decrypt(self.oe)
+            return AES.new(hash.digest(), mode=AES.MODE_CBC,
+                           IV=b'\x00' * 16).decrypt(self.oe)
         hash = SHA256.new(password)
         hash.update(self.u_validation_salt)
         if hash.digest() == self.u_hash:
             hash = SHA256.new(password)
             hash.update(self.u_key_salt)
-            return AES.new(hash.digest(), mode=AES.MODE_CBC, IV=b'\x00' * 16).decrypt(self.ue)
+            return AES.new(hash.digest(), mode=AES.MODE_CBC,
+                           IV=b'\x00' * 16).decrypt(self.ue)
         return None
 
     def decrypt_aes256(self, objid, genno, data):
-        return AES.new(self.key, mode=AES.MODE_CBC, IV=data[:16]).decrypt(data[16:])
+        return AES.new(self.key, mode=AES.MODE_CBC,
+                       IV=data[:16]).decrypt(data[16:])
 
 
 # PDFDocument
@@ -629,7 +634,7 @@ class PDFDocument:
             (objs, n) = self._get_objects(stream)
             if self.caching:
                 self._parsed_objs[stream.objid] = (objs, n)
-        i = n*2+index
+        i = n * 2 + index
         try:
             obj = objs[i]
         except IndexError:
@@ -650,7 +655,7 @@ class PDFDocument:
         parser.set_document(self)
         objs = []
         try:
-            while 1:
+            while True:
                 (_, obj) = parser.nextobject()
                 objs.append(obj)
         except PSEOF:
@@ -723,7 +728,7 @@ class PDFDocument:
                     se = entry.get('SE')
                     yield (level, title, dest, action, se)
             if 'First' in entry and 'Last' in entry:
-                for x in search(entry['First'], level+1):
+                for x in search(entry['First'], level + 1):
                     yield x
             if 'Next' in entry:
                 for x in search(entry['Next'], level):

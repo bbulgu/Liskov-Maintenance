@@ -31,15 +31,15 @@ def rldecode(data):
         if length == 128:
             break
         if length >= 0 and length < 128:
-            run = data[i+1:(i+1)+(length+1)]
+            run = data[i + 1:(i + 1) + (length + 1)]
             #print('length=%d, run=%s' % (length+1,run))
             decoded += run
-            i = (i+1) + (length+1)
+            i = (i + 1) + (length + 1)
         if length > 128:
-            run = data[i+1:i+2]*(257-length)
+            run = data[i + 1:i + 2] * (257 - length)
             #print('length=%d, run=%s' % (257-length,run))
             decoded += run
-            i = (i+1) + 1
+            i = (i + 1) + 1
     return decoded
 
 

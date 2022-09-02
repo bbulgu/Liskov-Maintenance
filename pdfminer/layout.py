@@ -107,8 +107,8 @@ class LTComponent(LTItem):
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
-        self.width = x1-x0
-        self.height = y1-y0
+        self.width = x1 - x0
+        self.height = y1 - y0
         self.bbox = bbox
         return
 
@@ -124,12 +124,12 @@ class LTComponent(LTItem):
         if self.is_hoverlap(obj):
             return 0
         else:
-            return min(abs(self.x0-obj.x1), abs(self.x1-obj.x0))
+            return min(abs(self.x0 - obj.x1), abs(self.x1 - obj.x0))
 
     def hoverlap(self, obj):
         assert isinstance(obj, LTComponent)
         if self.is_hoverlap(obj):
-            return min(abs(self.x0-obj.x1), abs(self.x1-obj.x0))
+            return min(abs(self.x0 - obj.x1), abs(self.x1 - obj.x0))
         else:
             return 0
 
@@ -142,12 +142,12 @@ class LTComponent(LTItem):
         if self.is_voverlap(obj):
             return 0
         else:
-            return min(abs(self.y0-obj.y1), abs(self.y1-obj.y0))
+            return min(abs(self.y0 - obj.y1), abs(self.y1 - obj.y0))
 
     def voverlap(self, obj):
         assert isinstance(obj, LTComponent)
         if self.is_voverlap(obj):
-            return min(abs(self.y0-obj.y1), abs(self.y1-obj.y0))
+            return min(abs(self.y0 - obj.y1), abs(self.y1 - obj.y0))
         else:
             return 0
 
@@ -244,17 +244,17 @@ class LTChar(LTComponent, LTText):
             vy = (1000 - vy) * fontsize * .001
             tx = -vx
             ty = vy + rise
-            bll = (tx, ty+self.adv)
-            bur = (tx+width, ty)
+            bll = (tx, ty + self.adv)
+            bur = (tx + width, ty)
         else:
             # horizontal
             height = font.get_height() * fontsize
             descent = font.get_descent() * fontsize
             ty = descent + rise
             bll = (0, ty)
-            bur = (self.adv, ty+height)
+            bur = (self.adv, ty + height)
         (a, b, c, d, e, f) = self.matrix
-        self.upright = (0 < a*d*scaling and b*c <= 0)
+        self.upright = (0 < a * d * scaling and b * c <= 0)
         (x0, y0) = apply_matrix_pt(self.matrix, bll)
         (x1, y1) = apply_matrix_pt(self.matrix, bur)
         if x1 < x0:
@@ -337,7 +337,8 @@ class LTTextContainer(LTExpandableContainer, LTText):
         return
 
     def get_text(self):
-        return ''.join(obj.get_text() for obj in self if isinstance(obj, LTText))
+        return ''.join(obj.get_text()
+                       for obj in self if isinstance(obj, LTText))
 
 
 # LTTextLine
@@ -373,20 +374,20 @@ class LTTextLineHorizontal(LTTextLine):
     def add(self, obj):
         if isinstance(obj, LTChar) and self.word_margin:
             margin = self.word_margin * max(obj.width, obj.height)
-            if self._x1 < obj.x0-margin:
+            if self._x1 < obj.x0 - margin:
                 LTContainer.add(self, LTAnno(' '))
         self._x1 = obj.x1
         LTTextLine.add(self, obj)
         return
 
     def find_neighbors(self, plane, ratio):
-        d = ratio*self.height
-        objs = plane.find((self.x0, self.y0-d, self.x1, self.y1+d))
+        d = ratio * self.height
+        objs = plane.find((self.x0, self.y0 - d, self.x1, self.y1 + d))
         return [obj for obj in objs
                 if (isinstance(obj, LTTextLineHorizontal) and
-                    abs(obj.height-self.height) < d and
-                    (abs(obj.x0-self.x0) < d or
-                     abs(obj.x1-self.x1) < d))]
+                    abs(obj.height - self.height) < d and
+                    (abs(obj.x0 - self.x0) < d or
+                     abs(obj.x1 - self.x1) < d))]
 
 
 class LTTextLineVertical(LTTextLine):
@@ -399,20 +400,20 @@ class LTTextLineVertical(LTTextLine):
     def add(self, obj):
         if isinstance(obj, LTChar) and self.word_margin:
             margin = self.word_margin * max(obj.width, obj.height)
-            if obj.y1+margin < self._y0:
+            if obj.y1 + margin < self._y0:
                 LTContainer.add(self, LTAnno(' '))
         self._y0 = obj.y0
         LTTextLine.add(self, obj)
         return
 
     def find_neighbors(self, plane, ratio):
-        d = ratio*self.width
-        objs = plane.find((self.x0-d, self.y0, self.x1+d, self.y1))
+        d = ratio * self.width
+        objs = plane.find((self.x0 - d, self.y0, self.x1 + d, self.y1))
         return [obj for obj in objs
                 if (isinstance(obj, LTTextLineVertical) and
-                    abs(obj.width-self.width) < d and
-                    (abs(obj.y0-self.y0) < d or
-                     abs(obj.y1-self.y1) < d))]
+                    abs(obj.width - self.width) < d and
+                    (abs(obj.y0 - self.y0) < d or
+                     abs(obj.y1 - self.y1) < d))]
 
 
 # LTTextBox
@@ -471,8 +472,8 @@ class LTTextGroupLRTB(LTTextGroup):
         LTTextGroup.analyze(self, laparams)
         # reorder the objects from top-left to bottom-right.
         self._objs = csort(self._objs, key=lambda obj:
-                           (1-laparams.boxes_flow)*(obj.x0) -
-                           (1+laparams.boxes_flow)*(obj.y0+obj.y1))
+                           (1 - laparams.boxes_flow) * (obj.x0) -
+                           (1 + laparams.boxes_flow) * (obj.y0 + obj.y1))
         return
 
 
@@ -482,8 +483,8 @@ class LTTextGroupTBRL(LTTextGroup):
         LTTextGroup.analyze(self, laparams)
         # reorder the objects from top-right to bottom-left.
         self._objs = csort(self._objs, key=lambda obj:
-                           -(1+laparams.boxes_flow)*(obj.x0+obj.x1)
-                           - (1-laparams.boxes_flow)*(obj.y1))
+                           -(1 + laparams.boxes_flow) * (obj.x0 + obj.x1)
+                           - (1 - laparams.boxes_flow) * (obj.y1))
         return
 
 
@@ -621,7 +622,8 @@ class LTLayoutContainer(LTContainer):
             y0 = min(obj1.y0, obj2.y0)
             x1 = max(obj1.x1, obj2.x1)
             y1 = max(obj1.y1, obj2.y1)
-            return ((x1-x0)*(y1-y0) - obj1.width*obj1.height - obj2.width*obj2.height)
+            return ((x1 - x0) * (y1 - y0) - obj1.width *
+                    obj1.height - obj2.width * obj2.height)
 
         def isany(obj1, obj2):
             """Check if there's any other object between obj1 and obj2.
@@ -641,7 +643,7 @@ class LTLayoutContainer(LTContainer):
         dists = []
         for i in range(len(boxes)):
             obj1 = boxes[i]
-            for j in range(i+1, len(boxes)):
+            for j in range(i + 1, len(boxes)):
                 obj2 = boxes[j]
                 dists.append((0, dist(obj1, obj2), obj1, obj2))
         # We could use dists.sort(), but it would randomize the test result.
@@ -709,7 +711,7 @@ class LTFigure(LTLayoutContainer):
         self.matrix = matrix
         (x, y, w, h) = bbox
         bbox = get_bound(apply_matrix_pt(matrix, (p, q))
-                         for (p, q) in ((x, y), (x+w, y), (x, y+h), (x+w, y+h)))
+                         for (p, q) in ((x, y), (x + w, y), (x, y + h), (x + w, y + h)))
         LTLayoutContainer.__init__(self, bbox)
         return
 
