@@ -7,7 +7,7 @@ from .utils import isnumber
 from .pdffont import PDFUnicodeNotDefined
 
 
-##  PDFDevice
+# PDFDevice
 ##
 class PDFDevice:
 
@@ -57,7 +57,7 @@ class PDFDevice:
         return
 
 
-##  PDFTextDevice
+# PDFTextDevice
 ##
 class PDFTextDevice(PDFDevice):
 
@@ -124,7 +124,7 @@ class PDFTextDevice(PDFDevice):
         return 0
 
 
-##  TagExtractor
+# TagExtractor
 ##
 class TagExtractor(PDFDevice):
 

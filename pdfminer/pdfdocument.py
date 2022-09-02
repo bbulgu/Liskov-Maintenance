@@ -35,25 +35,31 @@ from .utils import nunpack
 from .utils import decode_text
 
 
-##  Exceptions
+# Exceptions
 ##
 class PDFNoValidXRef(PDFSyntaxError):
     pass
 
+
 class PDFNoOutlines(PDFException):
     pass
+
 
 class PDFDestinationNotFound(PDFException):
     pass
 
+
 class PDFEncryptionError(PDFException):
     pass
+
 
 class PDFPasswordIncorrect(PDFEncryptionError):
     pass
 
+
 class PDFTextExtractionNotAllowed(PDFEncryptionError):
     pass
+
 
 # some predefined literals and keywords.
 LITERAL_OBJSTM = LIT('ObjStm')
@@ -61,7 +67,7 @@ LITERAL_XREF = LIT('XRef')
 LITERAL_CATALOG = LIT('Catalog')
 
 
-##  XRefs
+# XRefs
 ##
 class PDFBaseXRef:
 
@@ -80,7 +86,7 @@ class PDFBaseXRef:
         raise KeyError(objid)
 
 
-##  PDFXRef
+# PDFXRef
 ##
 class PDFXRef(PDFBaseXRef):
 
@@ -107,11 +113,13 @@ class PDFXRef(PDFBaseXRef):
                 break
             f = line.strip().split(b' ')
             if len(f) != 2:
-                raise PDFNoValidXRef('Trailer not found: %r: line=%r' % (parser, line))
+                raise PDFNoValidXRef(
+                    'Trailer not found: %r: line=%r' % (parser, line))
             try:
                 (start, nobjs) = map(int, f)
             except ValueError:
-                raise PDFNoValidXRef('Invalid line: %r: line=%r' % (parser, line))
+                raise PDFNoValidXRef(
+                    'Invalid line: %r: line=%r' % (parser, line))
             for objid in range(start, start+nobjs):
                 try:
                     (_, line) = parser.nextline()
@@ -119,12 +127,14 @@ class PDFXRef(PDFBaseXRef):
                     raise PDFNoValidXRef('Unexpected EOF - file corrupted?')
                 f = line.strip().split(b' ')
                 if len(f) != 3:
-                    raise PDFNoValidXRef('Invalid XRef format: %r, line=%r' % (parser, line))
+                    raise PDFNoValidXRef(
+                        'Invalid XRef format: %r, line=%r' % (parser, line))
                 (pos, genno, use) = f
                 if use != b'n':
                     continue
                 self.offsets[objid] = (None, int(pos), int(genno))
-        if self.debug: logging.info('xref objects: %r' % self.offsets)
+        if self.debug:
+            logging.info('xref objects: %r' % self.offsets)
         self.load_trailer(parser)
         return
 
@@ -156,7 +166,7 @@ class PDFXRef(PDFBaseXRef):
             raise
 
 
-##  PDFXRefFallback
+# PDFXRefFallback
 ##
 class PDFXRefFallback(PDFXRef):
 
@@ -175,7 +185,8 @@ class PDFXRefFallback(PDFXRef):
             if line.startswith(b'trailer'):
                 parser.seek(pos)
                 self.load_trailer(parser)
-                if self.debug: logging.info('trailer: %r' % self.get_trailer())
+                if self.debug:
+                    logging.info('trailer: %r' % self.get_trailer())
                 break
             m = self.PDFOBJ_CUE.match(line)
             if not m:
@@ -210,7 +221,7 @@ class PDFXRefFallback(PDFXRef):
         return
 
 
-##  PDFXRefStream
+# PDFXRefStream
 ##
 class PDFXRefStream(PDFBaseXRef):
 
@@ -244,8 +255,8 @@ class PDFXRefStream(PDFBaseXRef):
         self.trailer = stream.attrs
         if self.debug:
             logging.info('xref stream: objid=%s, fields=%d,%d,%d' %
-                     (', '.join(map(repr, self.ranges)),
-                      self.fl1, self.fl2, self.fl3))
+                         (', '.join(map(repr, self.ranges)),
+                          self.fl1, self.fl2, self.fl3))
         return
 
     def get_trailer(self):
@@ -285,7 +296,7 @@ class PDFXRefStream(PDFBaseXRef):
             raise KeyError(objid)
 
 
-##  PDFSecurityHandler
+# PDFSecurityHandler
 ##
 class PDFStandardSecurityHandler:
 
@@ -303,7 +314,8 @@ class PDFStandardSecurityHandler:
     def init(self):
         self.init_params()
         if self.r not in self.supported_revisions:
-            raise PDFEncryptionError('Unsupported revision: param=%r' % self.param)
+            raise PDFEncryptionError(
+                'Unsupported revision: param=%r' % self.param)
         self.init_key()
         return
 
@@ -341,7 +353,7 @@ class PDFStandardSecurityHandler:
             hash.update(self.docid[0])  # 3
             result = ARC4.new(key).encrypt(hash.digest())  # 4
             for i in range(1, 20):  # 5
-                k = bytes( (c ^ i) for c in key )
+                k = bytes((c ^ i) for c in key)
                 result = ARC4.new(k).encrypt(result)
             result += result  # 6
             return result
@@ -400,7 +412,7 @@ class PDFStandardSecurityHandler:
         else:
             user_password = self.o
             for i in range(19, -1, -1):
-                k = bytes( (c ^ i) for c in key )
+                k = bytes((c ^ i) for c in key)
                 user_password = ARC4.new(k).decrypt(user_password)
         return self.authenticate_user_password(user_password)
 
@@ -408,7 +420,8 @@ class PDFStandardSecurityHandler:
         return self.decrypt_rc4(objid, genno, data)
 
     def decrypt_rc4(self, objid, genno, data):
-        key = self.key + struct.pack('<L', objid)[:3] + struct.pack('<L', genno)[:2]
+        key = self.key + \
+            struct.pack('<L', objid)[:3] + struct.pack('<L', genno)[:2]
         hash = md5.md5(key)
         key = hash.digest()[:min(len(key), 16)]
         return ARC4.new(key).decrypt(data)
@@ -426,16 +439,19 @@ class PDFStandardSecurityHandlerV4(PDFStandardSecurityHandler):
         self.strf = literal_name(self.param['StrF'])
         self.encrypt_metadata = bool(self.param.get('EncryptMetadata', True))
         if self.stmf != self.strf:
-            raise PDFEncryptionError('Unsupported crypt filter: param=%r' % self.param)
+            raise PDFEncryptionError(
+                'Unsupported crypt filter: param=%r' % self.param)
         self.cfm = {}
         for k, v in self.cf.items():
             f = self.get_cfm(literal_name(v['CFM']))
             if f is None:
-                raise PDFEncryptionError('Unknown crypt filter method: param=%r' % self.param)
+                raise PDFEncryptionError(
+                    'Unknown crypt filter method: param=%r' % self.param)
             self.cfm[k] = f
         self.cfm['Identity'] = self.decrypt_identity
         if self.strf not in self.cfm:
-            raise PDFEncryptionError('Undefined crypt filter: param=%r' % self.param)
+            raise PDFEncryptionError(
+                'Undefined crypt filter: param=%r' % self.param)
         return
 
     def get_cfm(self, name):
@@ -459,7 +475,9 @@ class PDFStandardSecurityHandlerV4(PDFStandardSecurityHandler):
         return data
 
     def decrypt_aes128(self, objid, genno, data):
-        key = self.key + struct.pack('<L', objid)[:3] + struct.pack('<L', genno)[:2] + b'sAlT'
+        key = self.key + \
+            struct.pack('<L', objid)[:3] + \
+            struct.pack('<L', genno)[:2] + b'sAlT'
         hash = md5.md5(key)
         key = hash.digest()[:min(len(key), 16)]
         return AES.new(key, mode=AES.MODE_CBC, IV=data[:16]).decrypt(data[16:])
@@ -510,7 +528,7 @@ class PDFStandardSecurityHandlerV5(PDFStandardSecurityHandlerV4):
         return AES.new(self.key, mode=AES.MODE_CBC, IV=data[:16]).decrypt(data[16:])
 
 
-##  PDFDocument
+# PDFDocument
 ##
 class PDFDocument:
 
@@ -601,7 +619,7 @@ class PDFDocument:
         self.is_printable = handler.is_printable()
         self.is_modifiable = handler.is_modifiable()
         self.is_extractable = handler.is_extractable()
-        self._parser.fallback = False # need to read streams with exact length
+        self._parser.fallback = False  # need to read streams with exact length
         return
 
     def _getobj_objstm(self, stream, index, objid):
@@ -675,7 +693,8 @@ class PDFDocument:
                     else:
                         obj = self._getobj_parse(index, objid)
                         if self.decipher:
-                            obj = decipher_all(self.decipher, objid, genno, obj)
+                            obj = decipher_all(
+                                self.decipher, objid, genno, obj)
 
                     if isinstance(obj, PDFStream):
                         obj.set_objid(objid, genno)
