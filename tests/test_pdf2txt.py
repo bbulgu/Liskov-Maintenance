@@ -1,10 +1,11 @@
 from tools.pdf2txt import *
 from pdfminer.layout import LAParams
 
-
 """
 Tests the commandline part of pdf2txt.py
 """
+
+
 def test_cmd():
     commandline(['pdf2txt.py', '-P', 'test', '../sample.pdf'])
 
@@ -12,6 +13,8 @@ def test_cmd():
 """
 Tests the pdf conversion part of pdf2txt.py
 """
+
+
 def test_pdfconversion():
     args = ['../sample.pdf']
     password = b'test'

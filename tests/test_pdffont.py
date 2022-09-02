@@ -1,9 +1,10 @@
 from pdfminer.pdffont import *
 
-
 """
 Test get_widths with varying inputs 
 """
+
+
 def test_get_widths():
     assert get_widths([1]) == {}
     assert get_widths([1, 2, 3]) == {1: 3, 2: 3}
@@ -13,6 +14,8 @@ def test_get_widths():
 """
 Test get_widths2 with varying inputs 
 """
+
+
 def test_get_widths2():
     assert get_widths2([1]) == {}
     assert get_widths2([1, 2, 3, 4, 5]) == {1: (3, (4, 5)), 2: (3, (4, 5))}
