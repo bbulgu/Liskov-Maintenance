@@ -1,7 +1,7 @@
 # Project for Maintenance Programming
 
 ## Coding convention
-For coding convention we are going too use PEP 8 (https://peps.python.org/pep-0008/) with flake8 setup in Github actions.
+For coding convention we are going too use <a href="https://peps.python.org/pep-0008/">PEP 8</a> with flake8 setup in Github actions.
 
 ## Code review guidelines
 1. Descriptive function names.
