@@ -1,3 +1,19 @@
+# Project for Maintenance Programming
+
+## Coding convention
+For coding convention we are going too use PEP 8 (https://peps.python.org/pep-0008/) with flake8 setup in Github actions.
+
+## Code review guidelines
+1. Descriptive function names.
+2. Big chunks of code should be refactored if possible.
+3. An active pull request should be handled within 3 working days.
+4. Make sure the code is well documented where needed.
+
+## Testing framework
+We chose pytest as our framework for no specific reason.
+
+Below follows the readme file of the original repository
+
 # PDFMiner
 
 PDFMiner is a text extraction tool for PDF documents.
