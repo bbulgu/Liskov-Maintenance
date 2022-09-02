@@ -41,8 +41,3 @@ def rldecode(data):
             decoded += run
             i = (i+1) + 1
     return decoded
-
-
-if __name__ == '__main__':
-    import doctest
-    print('pdfminer.runlength', doctest.testmod())

@@ -1080,8 +1080,3 @@ class RijndaelEncryptor:
     def encrypt(self, plaintext):
         assert len(plaintext) == 16
         return rijndaelEncrypt(self.rk, self.nrounds, plaintext)
-
-
-if __name__ == '__main__':
-    import doctest
-    print('pdfminer.rijndael', doctest.testmod())
