@@ -12,6 +12,9 @@ For coding convention we are going too use <a href="https://peps.python.org/pep-
 ## Testing framework
 We chose pytest as our framework for no specific reason.
 
+## Code review deadline
+For the code review deadline the reviews should be done no later than two (2) days before the sprint deadline.
+
 Below follows the readme file of the original repository
 
 # PDFMiner
