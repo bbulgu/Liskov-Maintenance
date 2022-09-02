@@ -3,7 +3,7 @@ import sys
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.pdfdevice import PDFDevice, TagExtractor
+from pdfminer.pdfdevice import TagExtractor
 from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
 from pdfminer.cmapdb import CMapDB
@@ -16,7 +16,7 @@ Prints how the tool should be used.
 
 
 def usage():
-    print(f'usage: pdf2txt.py [-P password] [-o output] [-t text|html|xml|tag]'
+    print('usage: pdf2txt.py [-P password] [-o output] [-t text|html|xml|tag]'
           ' [-O output_dir] [-c encoding] [-s scale] [-R rotation]'
           ' [-Y normal|loose|exact] [-p pagenos] [-m maxpages]'
           ' [-S] [-C] [-n] [-A] [-V] [-M char_margin] [-L line_margin]'
@@ -34,10 +34,12 @@ def commandline(argv):
     import getopt
 
     try:
-        (opts, args) = getopt.getopt(argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SCnAVM:W:L:F:')
+        (opts, args) = getopt.getopt(
+            argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SCnAVM:W:L:F:')
     except getopt.GetoptError:
         return usage()
-    if not args: return usage()
+    if not args:
+        return usage()
 
     # debug option
     debug = 0
@@ -104,9 +106,22 @@ def commandline(argv):
     CMapDB.debug = debug
     PDFPageInterpreter.debug = debug
     #
-    pdfconversion(args, password, pagenos, maxpages, outfile, outtype, imagewriter,
-                  rotation, stripcontrol, layoutmode, encoding, scale,
-                  caching, laparams, debug)
+    pdfconversion(
+        args,
+        password,
+        pagenos,
+        maxpages,
+        outfile,
+        outtype,
+        imagewriter,
+        rotation,
+        stripcontrol,
+        layoutmode,
+        encoding,
+        scale,
+        caching,
+        laparams,
+        debug)
 
 
 """
@@ -114,9 +129,22 @@ Converts pdf to specified output format and filetype.
 """
 
 
-def pdfconversion(args, password, pagenos, maxpages, outfile, outtype, imagewriter,
-                  rotation, stripcontrol, layoutmode, encoding, scale,
-                  caching, laparams, debug):
+def pdfconversion(
+        args,
+        password,
+        pagenos,
+        maxpages,
+        outfile,
+        outtype,
+        imagewriter,
+        rotation,
+        stripcontrol,
+        layoutmode,
+        encoding,
+        scale,
+        caching,
+        laparams,
+        debug):
     rsrcmgr = PDFResourceManager(caching=caching)
     if not outtype:
         outtype = 'text'
@@ -149,9 +177,13 @@ def pdfconversion(args, password, pagenos, maxpages, outfile, outtype, imagewrit
     for fname in args:
         with open(fname, 'rb') as fp:
             interpreter = PDFPageInterpreter(rsrcmgr, device)
-            for page in PDFPage.get_pages(fp, pagenos,
-                                          maxpages=maxpages, password=password,
-                                          caching=caching, check_extractable=True):
+            for page in PDFPage.get_pages(
+                    fp,
+                    pagenos,
+                    maxpages=maxpages,
+                    password=password,
+                    caching=caching,
+                    check_extractable=True):
                 page.rotate = (page.rotate + rotation) % 360
                 interpreter.process_page(page)
     device.close()

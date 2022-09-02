@@ -707,14 +707,12 @@ if len(struct.pack('L', 0)) == 4:
     def GETU32(x):
         return struct.unpack('>L', x)[0]
 
-
     def PUTU32(x):
         return struct.pack('>L', x)
 else:
     # 64bit
     def GETU32(x):
         return struct.unpack('>I', x)[0]
-
 
     def PUTU32(x):
         return struct.pack('>I', x)
@@ -731,7 +729,7 @@ def rijndaelSetupEncrypt(key, keybits):
     rk[2] = GETU32(key[8:12])
     rk[3] = GETU32(key[12:16])
     if keybits == 128:
-        while 1:
+        while True:
             temp = rk[p + 3]
             rk[p + 4] = (rk[p + 0] ^
                          (Te4[(temp >> 16) & 0xff] & 0xff000000) ^
@@ -743,13 +741,14 @@ def rijndaelSetupEncrypt(key, keybits):
             rk[p + 6] = rk[p + 2] ^ rk[p + 5]
             rk[p + 7] = rk[p + 3] ^ rk[p + 6]
             i += 1
-            if i == 10: return (rk, 10)
+            if i == 10:
+                return (rk, 10)
             p += 4
 
     rk[4] = GETU32(key[16:20])
     rk[5] = GETU32(key[20:24])
     if keybits == 192:
-        while 1:
+        while True:
             temp = rk[p + 5]
             rk[p + 6] = (rk[p + 0] ^
                          (Te4[(temp >> 16) & 0xff] & 0xff000000) ^
@@ -761,7 +760,8 @@ def rijndaelSetupEncrypt(key, keybits):
             rk[p + 8] = rk[p + 2] ^ rk[p + 7]
             rk[p + 9] = rk[p + 3] ^ rk[p + 8]
             i += 1
-            if i == 8: return (rk, 12)
+            if i == 8:
+                return (rk, 12)
             rk[p + 10] = rk[p + 4] ^ rk[p + 9]
             rk[p + 11] = rk[p + 5] ^ rk[p + 10]
             p += 6
@@ -769,7 +769,7 @@ def rijndaelSetupEncrypt(key, keybits):
     rk[6] = GETU32(key[24:28])
     rk[7] = GETU32(key[28:32])
     if keybits == 256:
-        while 1:
+        while True:
             temp = rk[p + 7]
             rk[p + 8] = (rk[p + 0] ^
                          (Te4[(temp >> 16) & 0xff] & 0xff000000) ^
@@ -781,7 +781,8 @@ def rijndaelSetupEncrypt(key, keybits):
             rk[p + 10] = rk[p + 2] ^ rk[p + 9]
             rk[p + 11] = rk[p + 3] ^ rk[p + 10]
             i += 1
-            if i == 7: return (rk, 14)
+            if i == 7:
+                return (rk, 14)
             temp = rk[p + 11]
             rk[p + 12] = (rk[p + 4] ^
                           (Te4[(temp >> 24)] & 0xff000000) ^
@@ -806,44 +807,45 @@ def rijndaelSetupDecrypt(key, keybits):
     i = 0
     j = 4 * nrounds
     while i < j:
-        temp = rk[i];
-        rk[i] = rk[j];
+        temp = rk[i]
+        rk[i] = rk[j]
         rk[j] = temp
-        temp = rk[i + 1];
-        rk[i + 1] = rk[j + 1];
+        temp = rk[i + 1]
+        rk[i + 1] = rk[j + 1]
         rk[j + 1] = temp
-        temp = rk[i + 2];
-        rk[i + 2] = rk[j + 2];
+        temp = rk[i + 2]
+        rk[i + 2] = rk[j + 2]
         rk[j + 2] = temp
-        temp = rk[i + 3];
-        rk[i + 3] = rk[j + 3];
+        temp = rk[i + 3]
+        rk[i + 3] = rk[j + 3]
         rk[j + 3] = temp
         i += 4
         j -= 4
-    # apply the inverse MixColumn transform to all round keys but the first and the last:
+    # apply the inverse MixColumn transform to all round keys but the first
+    # and the last:
     p = 0
     for i in range(1, nrounds):
         p += 4
         rk[p + 0] = (
-                Td0[Te4[(rk[p + 0] >> 24)] & 0xff] ^
-                Td1[Te4[(rk[p + 0] >> 16) & 0xff] & 0xff] ^
-                Td2[Te4[(rk[p + 0] >> 8) & 0xff] & 0xff] ^
-                Td3[Te4[(rk[p + 0]) & 0xff] & 0xff])
+            Td0[Te4[(rk[p + 0] >> 24)] & 0xff] ^
+            Td1[Te4[(rk[p + 0] >> 16) & 0xff] & 0xff] ^
+            Td2[Te4[(rk[p + 0] >> 8) & 0xff] & 0xff] ^
+            Td3[Te4[(rk[p + 0]) & 0xff] & 0xff])
         rk[p + 1] = (
-                Td0[Te4[(rk[p + 1] >> 24)] & 0xff] ^
-                Td1[Te4[(rk[p + 1] >> 16) & 0xff] & 0xff] ^
-                Td2[Te4[(rk[p + 1] >> 8) & 0xff] & 0xff] ^
-                Td3[Te4[(rk[p + 1]) & 0xff] & 0xff])
+            Td0[Te4[(rk[p + 1] >> 24)] & 0xff] ^
+            Td1[Te4[(rk[p + 1] >> 16) & 0xff] & 0xff] ^
+            Td2[Te4[(rk[p + 1] >> 8) & 0xff] & 0xff] ^
+            Td3[Te4[(rk[p + 1]) & 0xff] & 0xff])
         rk[p + 2] = (
-                Td0[Te4[(rk[p + 2] >> 24)] & 0xff] ^
-                Td1[Te4[(rk[p + 2] >> 16) & 0xff] & 0xff] ^
-                Td2[Te4[(rk[p + 2] >> 8) & 0xff] & 0xff] ^
-                Td3[Te4[(rk[p + 2]) & 0xff] & 0xff])
+            Td0[Te4[(rk[p + 2] >> 24)] & 0xff] ^
+            Td1[Te4[(rk[p + 2] >> 16) & 0xff] & 0xff] ^
+            Td2[Te4[(rk[p + 2] >> 8) & 0xff] & 0xff] ^
+            Td3[Te4[(rk[p + 2]) & 0xff] & 0xff])
         rk[p + 3] = (
-                Td0[Te4[(rk[p + 3] >> 24)] & 0xff] ^
-                Td1[Te4[(rk[p + 3] >> 16) & 0xff] & 0xff] ^
-                Td2[Te4[(rk[p + 3] >> 8) & 0xff] & 0xff] ^
-                Td3[Te4[(rk[p + 3]) & 0xff] & 0xff])
+            Td0[Te4[(rk[p + 3] >> 24)] & 0xff] ^
+            Td1[Te4[(rk[p + 3] >> 16) & 0xff] & 0xff] ^
+            Td2[Te4[(rk[p + 3] >> 8) & 0xff] & 0xff] ^
+            Td3[Te4[(rk[p + 3]) & 0xff] & 0xff])
 
     return (rk, nrounds)
 
@@ -861,90 +863,91 @@ def rijndaelEncrypt(rk, nrounds, plaintext):
     # nrounds - 1 full rounds:
     r = nrounds >> 1
     p = 0
-    while 1:
+    while True:
         t0 = (
-                Te0[(s0 >> 24)] ^
-                Te1[(s1 >> 16) & 0xff] ^
-                Te2[(s2 >> 8) & 0xff] ^
-                Te3[(s3) & 0xff] ^
-                rk[p + 4])
+            Te0[(s0 >> 24)] ^
+            Te1[(s1 >> 16) & 0xff] ^
+            Te2[(s2 >> 8) & 0xff] ^
+            Te3[(s3) & 0xff] ^
+            rk[p + 4])
         t1 = (
-                Te0[(s1 >> 24)] ^
-                Te1[(s2 >> 16) & 0xff] ^
-                Te2[(s3 >> 8) & 0xff] ^
-                Te3[(s0) & 0xff] ^
-                rk[p + 5])
+            Te0[(s1 >> 24)] ^
+            Te1[(s2 >> 16) & 0xff] ^
+            Te2[(s3 >> 8) & 0xff] ^
+            Te3[(s0) & 0xff] ^
+            rk[p + 5])
         t2 = (
-                Te0[(s2 >> 24)] ^
-                Te1[(s3 >> 16) & 0xff] ^
-                Te2[(s0 >> 8) & 0xff] ^
-                Te3[(s1) & 0xff] ^
-                rk[p + 6])
+            Te0[(s2 >> 24)] ^
+            Te1[(s3 >> 16) & 0xff] ^
+            Te2[(s0 >> 8) & 0xff] ^
+            Te3[(s1) & 0xff] ^
+            rk[p + 6])
         t3 = (
-                Te0[(s3 >> 24)] ^
-                Te1[(s0 >> 16) & 0xff] ^
-                Te2[(s1 >> 8) & 0xff] ^
-                Te3[(s2) & 0xff] ^
-                rk[p + 7])
+            Te0[(s3 >> 24)] ^
+            Te1[(s0 >> 16) & 0xff] ^
+            Te2[(s1 >> 8) & 0xff] ^
+            Te3[(s2) & 0xff] ^
+            rk[p + 7])
         p += 8
         r -= 1
-        if r == 0: break
+        if r == 0:
+            break
         s0 = (
-                Te0[(t0 >> 24)] ^
-                Te1[(t1 >> 16) & 0xff] ^
-                Te2[(t2 >> 8) & 0xff] ^
-                Te3[(t3) & 0xff] ^
-                rk[p + 0])
+            Te0[(t0 >> 24)] ^
+            Te1[(t1 >> 16) & 0xff] ^
+            Te2[(t2 >> 8) & 0xff] ^
+            Te3[(t3) & 0xff] ^
+            rk[p + 0])
         s1 = (
-                Te0[(t1 >> 24)] ^
-                Te1[(t2 >> 16) & 0xff] ^
-                Te2[(t3 >> 8) & 0xff] ^
-                Te3[(t0) & 0xff] ^
-                rk[p + 1])
+            Te0[(t1 >> 24)] ^
+            Te1[(t2 >> 16) & 0xff] ^
+            Te2[(t3 >> 8) & 0xff] ^
+            Te3[(t0) & 0xff] ^
+            rk[p + 1])
         s2 = (
-                Te0[(t2 >> 24)] ^
-                Te1[(t3 >> 16) & 0xff] ^
-                Te2[(t0 >> 8) & 0xff] ^
-                Te3[(t1) & 0xff] ^
-                rk[p + 2])
+            Te0[(t2 >> 24)] ^
+            Te1[(t3 >> 16) & 0xff] ^
+            Te2[(t0 >> 8) & 0xff] ^
+            Te3[(t1) & 0xff] ^
+            rk[p + 2])
         s3 = (
-                Te0[(t3 >> 24)] ^
-                Te1[(t0 >> 16) & 0xff] ^
-                Te2[(t1 >> 8) & 0xff] ^
-                Te3[(t2) & 0xff] ^
-                rk[p + 3])
+            Te0[(t3 >> 24)] ^
+            Te1[(t0 >> 16) & 0xff] ^
+            Te2[(t1 >> 8) & 0xff] ^
+            Te3[(t2) & 0xff] ^
+            rk[p + 3])
 
     ciphertext = b''
 
     # apply last round and
     # map cipher state to byte array block:
     s0 = (
-            (Te4[(t0 >> 24)] & 0xff000000) ^
-            (Te4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
-            (Te4[(t2 >> 8) & 0xff] & 0x0000ff00) ^
-            (Te4[(t3) & 0xff] & 0x000000ff) ^
-            rk[p + 0])
+        (Te4[(t0 >> 24)] & 0xff000000) ^
+        (Te4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
+        (Te4[(t2 >> 8) & 0xff] & 0x0000ff00) ^
+        (Te4[(t3) & 0xff] & 0x000000ff) ^
+        rk[p + 0])
     ciphertext += PUTU32(s0)
     s1 = (
-            (Te4[(t1 >> 24)] & 0xff000000) ^
-            (Te4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
-            (Te4[(t3 >> 8) & 0xff] & 0x0000ff00) ^
-            (Te4[(t0) & 0xff] & 0x000000ff) ^
-            rk[p + 1])
+        (Te4[(t1 >> 24)] & 0xff000000) ^
+        (Te4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
+        (Te4[(t3 >> 8) & 0xff] & 0x0000ff00) ^
+        (Te4[(t0) & 0xff] & 0x000000ff) ^
+        rk[p + 1])
     ciphertext += PUTU32(s1)
     s2 = (
-            (Te4[(t2 >> 24)] & 0xff000000) ^
-            (Te4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
-            (Te4[(t0 >> 8) & 0xff] & 0x0000ff00) ^
-            (Te4[(t1) & 0xff] & 0x000000ff) ^
-            rk[p + 2])
+        (Te4[(t2 >> 24)] & 0xff000000) ^
+        (Te4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
+        (Te4[(t0 >> 8) & 0xff] & 0x0000ff00) ^
+        (Te4[(t1) & 0xff] & 0x000000ff) ^
+        rk[p + 2])
     ciphertext += PUTU32(s2)
     s3 = (
-            (Te4[(t3 >> 24)] & 0xff000000) ^
-            (Te4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
-            (Te4[(t1 >> 8) & 0xff] & 0x0000ff00) ^
-            (Te4[(t2) & 0xff] & 0x000000ff) ^
-            rk[p + 3])
+        (Te4[(t3 >> 24)] & 0xff000000) ^
+        (Te4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
+        (Te4[(t1 >> 8) & 0xff] & 0x0000ff00) ^
+        (Te4[(t2) & 0xff] & 0x000000ff) ^
+        rk[p + 3])
     ciphertext += PUTU32(s3)
 
     assert len(ciphertext) == 16
@@ -964,90 +967,91 @@ def rijndaelDecrypt(rk, nrounds, ciphertext):
     # nrounds - 1 full rounds:
     r = nrounds >> 1
     p = 0
-    while 1:
+    while True:
         t0 = (
-                Td0[(s0 >> 24)] ^
-                Td1[(s3 >> 16) & 0xff] ^
-                Td2[(s2 >> 8) & 0xff] ^
-                Td3[(s1) & 0xff] ^
-                rk[p + 4])
+            Td0[(s0 >> 24)] ^
+            Td1[(s3 >> 16) & 0xff] ^
+            Td2[(s2 >> 8) & 0xff] ^
+            Td3[(s1) & 0xff] ^
+            rk[p + 4])
         t1 = (
-                Td0[(s1 >> 24)] ^
-                Td1[(s0 >> 16) & 0xff] ^
-                Td2[(s3 >> 8) & 0xff] ^
-                Td3[(s2) & 0xff] ^
-                rk[p + 5])
+            Td0[(s1 >> 24)] ^
+            Td1[(s0 >> 16) & 0xff] ^
+            Td2[(s3 >> 8) & 0xff] ^
+            Td3[(s2) & 0xff] ^
+            rk[p + 5])
         t2 = (
-                Td0[(s2 >> 24)] ^
-                Td1[(s1 >> 16) & 0xff] ^
-                Td2[(s0 >> 8) & 0xff] ^
-                Td3[(s3) & 0xff] ^
-                rk[p + 6])
+            Td0[(s2 >> 24)] ^
+            Td1[(s1 >> 16) & 0xff] ^
+            Td2[(s0 >> 8) & 0xff] ^
+            Td3[(s3) & 0xff] ^
+            rk[p + 6])
         t3 = (
-                Td0[(s3 >> 24)] ^
-                Td1[(s2 >> 16) & 0xff] ^
-                Td2[(s1 >> 8) & 0xff] ^
-                Td3[(s0) & 0xff] ^
-                rk[p + 7])
+            Td0[(s3 >> 24)] ^
+            Td1[(s2 >> 16) & 0xff] ^
+            Td2[(s1 >> 8) & 0xff] ^
+            Td3[(s0) & 0xff] ^
+            rk[p + 7])
         p += 8
         r -= 1
-        if r == 0: break
+        if r == 0:
+            break
         s0 = (
-                Td0[(t0 >> 24)] ^
-                Td1[(t3 >> 16) & 0xff] ^
-                Td2[(t2 >> 8) & 0xff] ^
-                Td3[(t1) & 0xff] ^
-                rk[p + 0])
+            Td0[(t0 >> 24)] ^
+            Td1[(t3 >> 16) & 0xff] ^
+            Td2[(t2 >> 8) & 0xff] ^
+            Td3[(t1) & 0xff] ^
+            rk[p + 0])
         s1 = (
-                Td0[(t1 >> 24)] ^
-                Td1[(t0 >> 16) & 0xff] ^
-                Td2[(t3 >> 8) & 0xff] ^
-                Td3[(t2) & 0xff] ^
-                rk[p + 1])
+            Td0[(t1 >> 24)] ^
+            Td1[(t0 >> 16) & 0xff] ^
+            Td2[(t3 >> 8) & 0xff] ^
+            Td3[(t2) & 0xff] ^
+            rk[p + 1])
         s2 = (
-                Td0[(t2 >> 24)] ^
-                Td1[(t1 >> 16) & 0xff] ^
-                Td2[(t0 >> 8) & 0xff] ^
-                Td3[(t3) & 0xff] ^
-                rk[p + 2])
+            Td0[(t2 >> 24)] ^
+            Td1[(t1 >> 16) & 0xff] ^
+            Td2[(t0 >> 8) & 0xff] ^
+            Td3[(t3) & 0xff] ^
+            rk[p + 2])
         s3 = (
-                Td0[(t3 >> 24)] ^
-                Td1[(t2 >> 16) & 0xff] ^
-                Td2[(t1 >> 8) & 0xff] ^
-                Td3[(t0) & 0xff] ^
-                rk[p + 3])
+            Td0[(t3 >> 24)] ^
+            Td1[(t2 >> 16) & 0xff] ^
+            Td2[(t1 >> 8) & 0xff] ^
+            Td3[(t0) & 0xff] ^
+            rk[p + 3])
 
     plaintext = b''
 
     # apply last round and
     # map cipher state to byte array block:
     s0 = (
-            (Td4[(t0 >> 24)] & 0xff000000) ^
-            (Td4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
-            (Td4[(t2 >> 8) & 0xff] & 0x0000ff00) ^
-            (Td4[(t1) & 0xff] & 0x000000ff) ^
-            rk[p + 0])
+        (Td4[(t0 >> 24)] & 0xff000000) ^
+        (Td4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
+        (Td4[(t2 >> 8) & 0xff] & 0x0000ff00) ^
+        (Td4[(t1) & 0xff] & 0x000000ff) ^
+        rk[p + 0])
     plaintext += PUTU32(s0)
     s1 = (
-            (Td4[(t1 >> 24)] & 0xff000000) ^
-            (Td4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
-            (Td4[(t3 >> 8) & 0xff] & 0x0000ff00) ^
-            (Td4[(t2) & 0xff] & 0x000000ff) ^
-            rk[p + 1])
+        (Td4[(t1 >> 24)] & 0xff000000) ^
+        (Td4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
+        (Td4[(t3 >> 8) & 0xff] & 0x0000ff00) ^
+        (Td4[(t2) & 0xff] & 0x000000ff) ^
+        rk[p + 1])
     plaintext += PUTU32(s1)
     s2 = (
-            (Td4[(t2 >> 24)] & 0xff000000) ^
-            (Td4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
-            (Td4[(t0 >> 8) & 0xff] & 0x0000ff00) ^
-            (Td4[(t3) & 0xff] & 0x000000ff) ^
-            rk[p + 2])
+        (Td4[(t2 >> 24)] & 0xff000000) ^
+        (Td4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
+        (Td4[(t0 >> 8) & 0xff] & 0x0000ff00) ^
+        (Td4[(t3) & 0xff] & 0x000000ff) ^
+        rk[p + 2])
     plaintext += PUTU32(s2)
     s3 = (
-            (Td4[(t3 >> 24)] & 0xff000000) ^
-            (Td4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
-            (Td4[(t1 >> 8) & 0xff] & 0x0000ff00) ^
-            (Td4[(t0) & 0xff] & 0x000000ff) ^
-            rk[p + 3])
+        (Td4[(t3 >> 24)] & 0xff000000) ^
+        (Td4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
+        (Td4[(t1 >> 8) & 0xff] & 0x0000ff00) ^
+        (Td4[(t0) & 0xff] & 0x000000ff) ^
+        rk[p + 3])
     plaintext += PUTU32(s3)
 
     assert len(plaintext) == 16
