@@ -5,7 +5,7 @@ from .glyphlist import glyphname2unicode
 from .latin_enc import ENCODING
 
 
-STRIP_NAME = re.compile(r'[0-9]+')
+STRIP_NAME = re.compile(r"[0-9]+")
 
 
 # name2unicode
@@ -40,10 +40,10 @@ class EncodingDB:
             pdf2unicode[pdf] = c
 
     encodings = {
-        'StandardEncoding': std2unicode,
-        'MacRomanEncoding': mac2unicode,
-        'WinAnsiEncoding': win2unicode,
-        'PDFDocEncoding': pdf2unicode,
+        "StandardEncoding": std2unicode,
+        "MacRomanEncoding": mac2unicode,
+        "WinAnsiEncoding": win2unicode,
+        "PDFDocEncoding": pdf2unicode,
     }
 
     @classmethod

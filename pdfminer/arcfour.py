@@ -50,6 +50,7 @@ class Arcfour:
 new = Arcfour
 
 # test
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
-    print('pdfminer.arcfour:', doctest.testmod())
+
+    print("pdfminer.arcfour:", doctest.testmod())

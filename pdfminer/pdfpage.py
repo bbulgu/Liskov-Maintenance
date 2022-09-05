@@ -11,8 +11,8 @@ from .pdfdocument import PDFDocument
 from .pdfdocument import PDFTextExtractionNotAllowed
 
 # some predefined literals and keywords.
-LITERAL_PAGE = LIT('Page')
-LITERAL_PAGES = LIT('Pages')
+LITERAL_PAGE = LIT("Page")
+LITERAL_PAGES = LIT("Pages")
 
 
 # PDFPage
@@ -51,18 +51,20 @@ class PDFPage:
         self.doc = doc
         self.pageid = pageid
         self.attrs = dict_value(attrs)
-        self.lastmod = resolve1(self.attrs.get('LastModified'))
-        self.resources = resolve1(self.attrs.get('Resources', dict()))
-        self.mediabox = resolve1(self.attrs['MediaBox'])
-        if 'CropBox' in self.attrs:
-            self.cropbox = resolve1(self.attrs['CropBox'])
+        self.lastmod = resolve1(self.attrs.get("LastModified"))
+        self.resources = resolve1(self.attrs.get("Resources", dict()))
+        self.mediabox = resolve1(self.attrs["MediaBox"])
+        if "CropBox" in self.attrs:
+            self.cropbox = resolve1(self.attrs["CropBox"])
         else:
             self.cropbox = self.mediabox
-        self.rotate = (int_value(self.attrs.get('Rotate', 0)) + 360) % 360
-        self.annots = self.attrs.get('Annots')
-        self.beads = self.attrs.get('B')
-        if 'Contents' in self.attrs:
-            contents = resolve1(self.attrs['Contents'])
+        self.rotate = (
+            int_value(self.attrs.get("Rotate", 0)) + 360
+        ) % 360
+        self.annots = self.attrs.get("Annots")
+        self.beads = self.attrs.get("B")
+        if "Contents" in self.attrs:
+            contents = resolve1(self.attrs["Contents"])
         else:
             contents = []
         if not isinstance(contents, list):
@@ -71,10 +73,14 @@ class PDFPage:
         return
 
     def __repr__(self):
-        return '<PDFPage: Resources=%r, MediaBox=%r>' % (
-            self.resources, self.mediabox)
+        return "<PDFPage: Resources=%r, MediaBox=%r>" % (
+            self.resources,
+            self.mediabox,
+        )
 
-    INHERITABLE_ATTRS = set(['Resources', 'MediaBox', 'CropBox', 'Rotate'])
+    INHERITABLE_ATTRS = set(
+        ["Resources", "MediaBox", "CropBox", "Rotate"]
+    )
 
     @classmethod
     def create_pages(klass, document):
@@ -88,20 +94,22 @@ class PDFPage:
             for (k, v) in parent.items():
                 if k in klass.INHERITABLE_ATTRS and k not in tree:
                     tree[k] = v
-            if tree.get('Type') is LITERAL_PAGES and 'Kids' in tree:
+            if tree.get("Type") is LITERAL_PAGES and "Kids" in tree:
                 if klass.debug:
-                    logging.info('Pages: Kids=%r' % tree['Kids'])
-                for c in list_value(tree['Kids']):
+                    logging.info("Pages: Kids=%r" % tree["Kids"])
+                for c in list_value(tree["Kids"]):
                     for x in search(c, tree):
                         yield x
-            elif tree.get('Type') is LITERAL_PAGE:
+            elif tree.get("Type") is LITERAL_PAGE:
                 if klass.debug:
-                    logging.info('Page: %r' % tree)
+                    logging.info("Page: %r" % tree)
                 yield (objid, tree)
+
         pages = False
-        if 'Pages' in document.catalog:
+        if "Pages" in document.catalog:
             for (objid, tree) in search(
-                    document.catalog['Pages'], document.catalog):
+                document.catalog["Pages"], document.catalog
+            ):
                 yield klass(document, objid, tree)
                 pages = True
         if not pages:
@@ -110,17 +118,25 @@ class PDFPage:
                 for objid in xref.get_objids():
                     try:
                         obj = document.getobj(objid)
-                        if isinstance(obj, dict) and obj.get(
-                                'Type') is LITERAL_PAGE:
+                        if (
+                            isinstance(obj, dict)
+                            and obj.get("Type") is LITERAL_PAGE
+                        ):
                             yield klass(document, objid, obj)
                     except PDFObjectNotFound:
                         pass
         return
 
     @classmethod
-    def get_pages(klass, fp,
-                  pagenos=None, maxpages=0, password=b'',
-                  caching=True, check_extractable=True):
+    def get_pages(
+        klass,
+        fp,
+        pagenos=None,
+        maxpages=0,
+        password=b"",
+        caching=True,
+        check_extractable=True,
+    ):
         # Create a PDF parser object associated with the file object.
         parser = PDFParser(fp)
         # Create a PDF document object that stores the document structure.
@@ -128,7 +144,8 @@ class PDFPage:
         # Check if the document allows text extraction. If not, abort.
         if check_extractable and not doc.is_extractable:
             raise PDFTextExtractionNotAllowed(
-                'Text extraction is not allowed: %r' % fp)
+                "Text extraction is not allowed: %r" % fp
+            )
         # Process each page contained in the document.
         for (pageno, page) in enumerate(klass.create_pages(doc)):
             if pagenos and (pageno not in pagenos):

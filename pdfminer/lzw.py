@@ -9,7 +9,6 @@ class CorruptDataError(Exception):
 # LZWDecoder
 ##
 class LZWDecoder:
-
     def __init__(self, fp):
         self.fp = fp
         self.buff = 0
@@ -28,13 +27,9 @@ class LZWDecoder:
                 # |-----8-bits-----|
                 # |-bpos-|-bits-|  |
                 # |      |----r----|
-                v = (
-                    v << bits) | (
-                    (self.buff >> (
-                        r -
-                        bits)) & (
-                        (1 << bits) -
-                        1))
+                v = (v << bits) | (
+                    (self.buff >> (r - bits)) & ((1 << bits) - 1)
+                )
                 self.bpos += bits
                 break
             else:
@@ -51,12 +46,12 @@ class LZWDecoder:
         return v
 
     def feed(self, code):
-        x = b''
+        x = b""
         if code == 256:
             self.table = [bytes([c]) for c in range(256)]  # 0-255
             self.table.append(None)  # 256
             self.table.append(None)  # 257
-            self.prevbuf = b''
+            self.prevbuf = b""
             self.nbits = 9
         elif code == 257:
             pass
@@ -71,12 +66,12 @@ class LZWDecoder:
                 x = self.table[code]
             else:
                 raise CorruptDataError
-            l = len(self.table)
-            if l == 511:
+            length = len(self.table)
+            if length == 511:
                 self.nbits = 10
-            elif l == 1023:
+            elif length == 1023:
                 self.nbits = 11
-            elif l == 2047:
+            elif length == 2047:
                 self.nbits = 12
             self.prevbuf = x
         return x
@@ -105,9 +100,10 @@ def lzwdecode(data):
     b'-----A---B'
     """
     fp = BytesIO(data)
-    return b''.join(LZWDecoder(fp).run())
+    return b"".join(LZWDecoder(fp).run())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
-    print('pdfminer.lzw', doctest.testmod())
+
+    print("pdfminer.lzw", doctest.testmod())

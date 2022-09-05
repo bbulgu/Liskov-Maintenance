@@ -10,17 +10,19 @@ def main(argv):
 
     def usage():
         print(
-            'usage: %s [-c enc=codec] output_dir regname [cid2code.txt ...]' %
-            argv[0])
+            "usage: %s [-c enc=codec] output_dir regname [cid2code.txt ...]"
+            % argv[0]
+        )
         return 100
+
     try:
-        (opts, args) = getopt.getopt(argv[1:], 'c:')
+        (opts, args) = getopt.getopt(argv[1:], "c:")
     except getopt.GetoptError:
         return usage()
     enc2codec = {}
     for (k, v) in opts:
-        if k == '-c':
-            (enc, _, codec) = v.partition('=')
+        if k == "-c":
+            (enc, _, codec) = v.partition("=")
             enc2codec[enc] = codec
     if not args:
         return usage()
@@ -33,5 +35,5 @@ def main(argv):
     return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main(sys.argv))

@@ -30,29 +30,31 @@ def ascii85decode(data):
     b'pleasure.'
     """
     n = b = 0
-    out = b''
+    out = b""
     for c in data:
         if 33 <= c and c <= 117:  # b'!' <= c and c <= b'u'
             n += 1
             b = b * 85 + (c - 33)
             if n == 5:
-                out += struct.pack('>L', b)
+                out += struct.pack(">L", b)
                 n = b = 0
         elif c == 122:  # b'z'
             assert n == 0
-            out += b'\0\0\0\0'
+            out += b"\0\0\0\0"
         elif c == 126:  # b'~'
             if n:
                 for _ in range(5 - n):
                     b = b * 85 + 84
-                out += struct.pack('>L', b)[:n - 1]
+                out += struct.pack(">L", b)[: n - 1]
             break
     return out
 
 
 # asciihexdecode(data)
-hex_re = re.compile(r'([a-f\d]{2})', re.IGNORECASE)
-trail_re = re.compile(r'^(?:[a-f\d]{2}|\s)*([a-f\d])[\s>]*$', re.IGNORECASE)
+hex_re = re.compile(r"([a-f\d]{2})", re.IGNORECASE)
+trail_re = re.compile(
+    r"^(?:[a-f\d]{2}|\s)*([a-f\d])[\s>]*$", re.IGNORECASE
+)
 
 
 def asciihexdecode(data):
@@ -72,7 +74,7 @@ def asciihexdecode(data):
     >>> asciihexdecode(b'7>')
     b'p'
     """
-    data = data.decode('latin1')
+    data = data.decode("latin1")
     out = [int(hx, 16) for hx in hex_re.findall(data)]
     m = trail_re.search(data)
     if m:
@@ -80,6 +82,7 @@ def asciihexdecode(data):
     return bytes(out)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
-    print('pdfminer.ascii85', doctest.testmod())
+
+    print("pdfminer.ascii85", doctest.testmod())
