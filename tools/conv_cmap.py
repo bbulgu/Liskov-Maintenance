@@ -10,7 +10,8 @@ def main(argv):
 
     def usage():
         print(
-            'usage: %s [-c enc=codec] output_dir regname [cid2code.txt ...]' % argv[0])
+            'usage: %s [-c enc=codec] output_dir regname [cid2code.txt ...]' %
+            argv[0])
         return 100
     try:
         (opts, args) = getopt.getopt(argv[1:], 'c:')

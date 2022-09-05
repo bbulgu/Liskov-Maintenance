@@ -252,8 +252,9 @@ def main(argv):
     import getopt
 
     def usage():
-        print(f'usage: {argv[0]} [-P password] [-a] [-p pageid] [-i objid] [-o output] '
-              '[-r|-b|-t] [-T] [-O output_dir] [-d] input.pdf ...')
+        print(
+            f'usage: {argv[0]} [-P password] [-a] [-p pageid] [-i objid] [-o output] '
+            '[-r|-b|-t] [-T] [-O output_dir] [-d] input.pdf ...')
         return 100
     try:
         (opts, args) = getopt.getopt(argv[1:], 'dP:ap:i:o:rbtTO:')

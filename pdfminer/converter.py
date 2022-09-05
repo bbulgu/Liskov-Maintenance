@@ -255,8 +255,12 @@ class HTMLConverter(PDFConverter):
         return
 
     def write_footer(self):
-        self.write('<div style="position:absolute; top:0px;">Page: %s</div>\n' %
-                   ', '.join('<a href="#%s">%s</a>' % (i, i) for i in range(1, self.pageno)))
+        self.write(
+            '<div style="position:absolute; top:0px;">Page: %s</div>\n' %
+            ', '.join(
+                '<a href="#%s">%s</a>' %
+                (i, i) for i in range(
+                    1, self.pageno)))
         self.write('</body></html>\n')
         return
 
@@ -267,11 +271,14 @@ class HTMLConverter(PDFConverter):
     def place_rect(self, color, borderwidth, x, y, w, h):
         color = self.rect_colors.get(color)
         if color is not None:
-            self.write('<span style="position:absolute; border: %s %dpx solid; '
-                       'left:%dpx; top:%dpx; width:%dpx; height:%dpx;"></span>\n' %
-                       (color, borderwidth,
-                        x * self.scale, (self._yoffset - y) * self.scale,
-                        w * self.scale, h * self.scale))
+            self.write(
+                '<span style="position:absolute; border: %s %dpx solid; '
+                'left:%dpx; top:%dpx; width:%dpx; height:%dpx;"></span>\n' % (color,
+                                                                              borderwidth,
+                                                                              x * self.scale,
+                                                                              (self._yoffset - y) * self.scale,
+                                                                              w * self.scale,
+                                                                              h * self.scale))
         return
 
     def place_border(self, color, borderwidth, item):
@@ -282,18 +289,30 @@ class HTMLConverter(PDFConverter):
     def place_image(self, item, borderwidth, x, y, w, h):
         if self.imagewriter is not None:
             name = self.imagewriter.export_image(item)
-            self.write('<img src="%s" border="%d" style="position:absolute; left:%dpx; top:%dpx;" '
-                       'width="%d" height="%d" />\n' %
-                       (q(name), borderwidth,
-                        x * self.scale, (self._yoffset - y) * self.scale,
-                        w * self.scale, h * self.scale))
+            self.write(
+                '<img src="%s" border="%d" style="position:absolute; left:%dpx; top:%dpx;" '
+                'width="%d" height="%d" />\n' % (q(name),
+                                                 borderwidth,
+                                                 x * self.scale,
+                                                 (self._yoffset - y) * self.scale,
+                                                 w * self.scale,
+                                                 h * self.scale))
         return
 
     def place_text(self, color, text, x, y, size):
         color = self.text_colors.get(color)
         if color is not None:
-            self.write('<span style="position:absolute; color:%s; left:%dpx; top:%dpx; font-size:%dpx;">' %
-                       (color, x * self.scale, (self._yoffset - y) * self.scale, size * self.scale * self.fontscale))
+            self.write(
+                '<span style="position:absolute; color:%s; left:%dpx; top:%dpx; font-size:%dpx;">' %
+                (color,
+                 x *
+                 self.scale,
+                 (self._yoffset -
+                  y) *
+                    self.scale,
+                    size *
+                    self.scale *
+                    self.fontscale))
             self.write_text(text)
             self.write('</span>\n')
         return
@@ -301,11 +320,15 @@ class HTMLConverter(PDFConverter):
     def begin_div(self, color, borderwidth, x, y, w, h, writing_mode=False):
         self._fontstack.append(self._font)
         self._font = None
-        self.write('<div style="position:absolute; border: %s %dpx solid; writing-mode:%s; '
-                   'left:%dpx; top:%dpx; width:%dpx; height:%dpx;">' %
-                   (color, borderwidth, writing_mode,
-                    x * self.scale, (self._yoffset - y) * self.scale,
-                    w * self.scale, h * self.scale))
+        self.write(
+            '<div style="position:absolute; border: %s %dpx solid; writing-mode:%s; '
+            'left:%dpx; top:%dpx; width:%dpx; height:%dpx;">' % (color,
+                                                                 borderwidth,
+                                                                 writing_mode,
+                                                                 x * self.scale,
+                                                                 (self._yoffset - y) * self.scale,
+                                                                 w * self.scale,
+                                                                 h * self.scale))
         return
 
     def end_div(self, color):
@@ -386,8 +409,14 @@ class HTMLConverter(PDFConverter):
                         if self.layoutmode != 'loose':
                             self.put_newline()
                     elif isinstance(item, LTTextBox):
-                        self.begin_div('textbox', 1, item.x0, item.y1, item.width, item.height,
-                                       item.get_writing_mode())
+                        self.begin_div(
+                            'textbox',
+                            1,
+                            item.x0,
+                            item.y1,
+                            item.width,
+                            item.height,
+                            item.get_writing_mode())
                         for child in item:
                             render(child)
                         self.end_div('textbox')
@@ -451,8 +480,10 @@ class XMLConverter(PDFConverter):
 
         def render(item):
             if isinstance(item, LTPage):
-                self.outfp.write('<page id="%s" bbox="%s" rotate="%d">\n' %
-                                 (item.pageid, bbox2str(item.bbox), item.rotate))
+                self.outfp.write(
+                    '<page id="%s" bbox="%s" rotate="%d">\n' %
+                    (item.pageid, bbox2str(
+                        item.bbox), item.rotate))
                 for child in item:
                     render(child)
                 if item.groups is not None:
@@ -468,8 +499,10 @@ class XMLConverter(PDFConverter):
                 self.outfp.write('<rect linewidth="%d" bbox="%s" />\n' %
                                  (item.linewidth, bbox2str(item.bbox)))
             elif isinstance(item, LTCurve):
-                self.outfp.write('<curve linewidth="%d" bbox="%s" pts="%s"/>\n' %
-                                 (item.linewidth, bbox2str(item.bbox), item.get_pts()))
+                self.outfp.write(
+                    '<curve linewidth="%d" bbox="%s" pts="%s"/>\n' %
+                    (item.linewidth, bbox2str(
+                        item.bbox), item.get_pts()))
             elif isinstance(item, LTFigure):
                 self.outfp.write('<figure name="%s" bbox="%s">\n' %
                                  (item.name, bbox2str(item.bbox)))
@@ -492,8 +525,8 @@ class XMLConverter(PDFConverter):
                     render(child)
                 self.outfp.write('</textbox>\n')
             elif isinstance(item, LTChar):
-                self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' %
-                                 (q(item.fontname), bbox2str(item.bbox), item.size))
+                self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' % (
+                    q(item.fontname), bbox2str(item.bbox), item.size))
                 self.write_text(item.get_text())
                 self.outfp.write('</text>\n')
             elif isinstance(item, LTText):
@@ -501,8 +534,9 @@ class XMLConverter(PDFConverter):
             elif isinstance(item, LTImage):
                 if self.imagewriter is not None:
                     name = self.imagewriter.export_image(item)
-                    self.outfp.write('<image src="%s" width="%d" height="%d" />\n' %
-                                     (q(name), item.width, item.height))
+                    self.outfp.write(
+                        '<image src="%s" width="%d" height="%d" />\n' %
+                        (q(name), item.width, item.height))
                 else:
                     self.outfp.write('<image width="%d" height="%d" />\n' %
                                      (item.width, item.height))

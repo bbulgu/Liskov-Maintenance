@@ -8,7 +8,6 @@ class install_cmap(install):
 
     def run(self):
         import os.path
-        import pdfminer
         from pdfminer.cmapdb import convert_cmap
         outdir = os.path.join(os.path.join(
             self.install_lib, 'pdfminer'), 'cmap')

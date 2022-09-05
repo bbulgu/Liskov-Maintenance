@@ -17,11 +17,12 @@ def main(argv):
     import getopt
 
     def usage():
-        print(f'usage: {argv[0]} [-P password] [-o output] [-t text|html|xml|tag]'
-              ' [-O output_dir] [-c encoding] [-s scale] [-R rotation]'
-              ' [-Y normal|loose|exact] [-p pagenos] [-m maxpages]'
-              ' [-S] [-C] [-n] [-A] [-V] [-M char_margin] [-L line_margin]'
-              ' [-W word_margin] [-F boxes_flow] [-d] input.pdf ...')
+        print(
+            f'usage: {argv[0]} [-P password] [-o output] [-t text|html|xml|tag]'
+            ' [-O output_dir] [-c encoding] [-s scale] [-R rotation]'
+            ' [-Y normal|loose|exact] [-p pagenos] [-m maxpages]'
+            ' [-S] [-C] [-n] [-A] [-V] [-M char_margin] [-L line_margin]'
+            ' [-W word_margin] [-F boxes_flow] [-d] input.pdf ...')
         return 100
     try:
         (opts, args) = getopt.getopt(
@@ -128,9 +129,13 @@ def main(argv):
     for fname in args:
         with open(fname, 'rb') as fp:
             interpreter = PDFPageInterpreter(rsrcmgr, device)
-            for page in PDFPage.get_pages(fp, pagenos,
-                                          maxpages=maxpages, password=password,
-                                          caching=caching, check_extractable=True):
+            for page in PDFPage.get_pages(
+                    fp,
+                    pagenos,
+                    maxpages=maxpages,
+                    password=password,
+                    caching=caching,
+                    check_extractable=True):
                 page.rotate = (page.rotate + rotation) % 360
                 interpreter.process_page(page)
     device.close()

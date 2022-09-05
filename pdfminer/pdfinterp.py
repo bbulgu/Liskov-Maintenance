@@ -70,12 +70,20 @@ class PDFTextState:
         return
 
     def __repr__(self):
-        return ('<PDFTextState: font=%r, fontsize=%r, charspace=%r, wordspace=%r, '
-                ' scaling=%r, leading=%r, render=%r, rise=%r, '
-                ' matrix=%r, linematrix=%r>' %
-                (self.font, self.fontsize, self.charspace, self.wordspace,
-                 self.scaling, self.leading, self.render, self.rise,
-                 self.matrix, self.linematrix))
+        return (
+            '<PDFTextState: font=%r, fontsize=%r, charspace=%r, wordspace=%r, '
+            ' scaling=%r, leading=%r, render=%r, rise=%r, '
+            ' matrix=%r, linematrix=%r>' %
+            (self.font,
+             self.fontsize,
+             self.charspace,
+             self.wordspace,
+             self.scaling,
+             self.leading,
+             self.render,
+             self.rise,
+             self.matrix,
+             self.linematrix))
 
     def copy(self):
         obj = PDFTextState()
@@ -760,7 +768,16 @@ class PDFPageInterpreter:
     def do_T_a(self):
         (a, b, c, d, e, f) = self.textstate.matrix
         self.textstate.matrix = (
-            a, b, c, d, self.textstate.leading * c + e, self.textstate.leading * d + f)
+            a,
+            b,
+            c,
+            d,
+            self.textstate.leading *
+            c +
+            e,
+            self.textstate.leading *
+            d +
+            f)
         self.textstate.linematrix = (0, 0)
         return
 

@@ -39,7 +39,6 @@ class WebAppHandler(SimpleHTTPRequestHandler):
         else:
             script, rest = rest, ''
         scriptname = '/' + script
-        scriptfile = self.translate_path(scriptname)
         env = {}
         env['SERVER_SOFTWARE'] = self.version_string()
         env['SERVER_NAME'] = self.server.server_name

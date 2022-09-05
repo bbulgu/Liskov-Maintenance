@@ -50,8 +50,9 @@ class LAParams:
         return
 
     def __repr__(self):
-        return ('<LAParams: char_margin=%.1f, line_margin=%.1f, word_margin=%.1f all_texts=%r>' %
-                (self.char_margin, self.line_margin, self.word_margin, self.all_texts))
+        return (
+            '<LAParams: char_margin=%.1f, line_margin=%.1f, word_margin=%.1f all_texts=%r>' %
+            (self.char_margin, self.line_margin, self.word_margin, self.all_texts))
 
 
 # LTItem
@@ -710,8 +711,11 @@ class LTFigure(LTLayoutContainer):
         self.name = name
         self.matrix = matrix
         (x, y, w, h) = bbox
-        bbox = get_bound(apply_matrix_pt(matrix, (p, q))
-                         for (p, q) in ((x, y), (x + w, y), (x, y + h), (x + w, y + h)))
+        bbox = get_bound(
+            apply_matrix_pt(
+                matrix, (p, q)) for (
+                p, q) in (
+                (x, y), (x + w, y), (x, y + h), (x + w, y + h)))
         LTLayoutContainer.__init__(self, bbox)
         return
 
