@@ -97,10 +97,6 @@ def dumptrailers(out, doc):
         out.write('\n</trailer>\n\n')
     return
 
-ESC_PAT = re.compile(r'[\000-\037&<>()"\042\047\134\177-\377]')
-def e(s):
-    return ESC_PAT.sub(lambda m:'&#%d;' % ord(m.group(0)), s)
-
 # dumpallobjs
 def dumpallobjs(out, doc, mode=None):
     visited = set()
@@ -140,9 +136,7 @@ def dumpoutline(outfp, fname, objids, pagenos, password=b'',
         try:
             outlines = doc.get_outlines()
             outfp.write('<outlines>\n')
-            print(outlines)
             for (level,title,dest,a,se) in outlines:
-                print("I FOR LOOP")
                 pageno = None
                 if dest:
                     dest = resolve_dest(dest)
@@ -154,10 +148,8 @@ def dumpoutline(outfp, fname, objids, pagenos, password=b'',
                         if subtype and repr(subtype) == '/GoTo' and action.get('D'):
                             dest = resolve_dest(action['D'])
                             pageno = pages[dest[0].objid]
-                s = e(title).encode('utf-8', 'xmlcharrefreplace')
-                print("Efter s")
+                s = q(title)
                 outfp.write('<outline level="%r" title="%s">\n' % (level, q(s)))
-                print("Efter outfp.write")
                 if dest is not None:
                     outfp.write('<dest>')
                     dumpxml(outfp, dest)
@@ -165,7 +157,6 @@ def dumpoutline(outfp, fname, objids, pagenos, password=b'',
                 if pageno is not None:
                     outfp.write('<pageno>%r</pageno>\n' % pageno)
                 outfp.write('</outline>\n')
-            print("Efter forloop")
             outfp.write('</outlines>\n')
         except PDFNoOutlines:
             pass
