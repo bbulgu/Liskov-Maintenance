@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import argparse
 import sys
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfparser import PDFParser
@@ -22,33 +21,10 @@ def main(argv):
                ' [-W word_margin] [-F boxes_flow] [-d] input.pdf ...')
         return 100
     try:
-        parser = argparse.ArgumentParser(description='Process arguments.')
-        parser.add_argument('-P', help="password", type=str, action='store')
-        parser.add_argument('-o', help="output", type=str, action='store')
-        parser.add_argument('-t', help="text", type=str, choices=['text', 'html', 'xml', 'tag'], action='store', default='text')
-        parser.add_argument('-O', help="output_dir", type=str, action='store')
-        parser.add_argument('-c', help="encoding", type=str, action='store')
-        parser.add_argument('-s', help="scale", type=int, action='store')
-        parser.add_argument('-R', help="rotation", type=int, action='store')
-        parser.add_argument('-Y', help="layoutmode", type=str, choices=['normal', 'loose', 'exact'], action='store')
-        parser.add_argument('-p', help="pagenos", type=int, action='store')
-        parser.add_argument('-m', help="maxpages", type=int, action='store')
-        parser.add_argument('-S', action='store_true')
-        parser.add_argument('-C', action='store_true')
-        parser.add_argument('-n', action='store_true')
-        parser.add_argument('-A', action='store_true')
-        parser.add_argument('-V', action='store_true')
-        parser.add_argument('-M', help='char_margin', type=float, action='store')
-        parser.add_argument('-L', help="line_margin", type=float, action='store')
-        parser.add_argument('-W', help="word_margin", type=float, action='store')
-        parser.add_argument('-F', help="boxes_flow", type=float, action='store')
-        parser.add_argument('-d', nargs='+', default=[])
-        parser.add_argument('files', metavar='file', type=str, help='the files you want to convert', nargs='*', default=[])
-        args = parser.parse_args(argv[1:])
-    except argparse.ArgumentError:
+        (opts, args) = getopt.getopt(argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SCnAVM:W:L:F:')
+    except getopt.GetoptError:
         return usage()
-    if not args.files:
-        return usage()
+    if not args: return usage()
     # debug option
     debug = 0
     # input option
@@ -68,7 +44,7 @@ def main(argv):
     caching = True
     showpageno = True
     laparams = LAParams()
-    for (k, v) in vars(args).items():
+    for (k, v) in opts:
         if k == '-d': debug += 1
         elif k == '-P': password = v.encode('ascii')
         elif k == '-o': outfile = v
@@ -106,7 +82,7 @@ def main(argv):
             elif outfile.endswith('.tag'):
                 outtype = 'tag'
     if outfile:
-        outfp = open(outfile, 'w+', encoding=encoding)
+        outfp = open(outfile, 'w', encoding=encoding)
     else:
         outfp = sys.stdout
     if outtype == 'text':
@@ -124,8 +100,7 @@ def main(argv):
         device = TagExtractor(rsrcmgr, outfp)
     else:
         return usage()
-    for fname in args.files:
-        print(args)
+    for fname in args:
         with open(fname, 'rb') as fp:
             interpreter = PDFPageInterpreter(rsrcmgr, device)
             for page in PDFPage.get_pages(fp, pagenos,
