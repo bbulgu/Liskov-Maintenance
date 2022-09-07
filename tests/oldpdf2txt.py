@@ -100,6 +100,7 @@ def main(argv):
         device = TagExtractor(rsrcmgr, outfp)
     else:
         return usage()
+
     for fname in args:
         with open(fname, 'rb') as fp:
             interpreter = PDFPageInterpreter(rsrcmgr, device)

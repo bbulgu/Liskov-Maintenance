@@ -23,27 +23,27 @@ def main(argv):
         return 100
     try:
         parser = argparse.ArgumentParser(description='Process arguments.')
-        parser.add_argument('-P', help="password", type=str, action='store')
+        parser.add_argument('-P', help="password", type=str, action='store', default='')
         parser.add_argument('-o', help="output", type=str, action='store')
         parser.add_argument('-t', help="text", type=str, choices=['text', 'html', 'xml', 'tag'], action='store', default='text')
         parser.add_argument('-O', help="output_dir", type=str, action='store')
-        parser.add_argument('-c', help="encoding", type=str, action='store')
-        parser.add_argument('-s', help="scale", type=int, action='store')
-        parser.add_argument('-R', help="rotation", type=int, action='store')
-        parser.add_argument('-Y', help="layoutmode", type=str, choices=['normal', 'loose', 'exact'], action='store')
-        parser.add_argument('-p', help="pagenos", type=int, action='store')
-        parser.add_argument('-m', help="maxpages", type=int, action='store')
-        parser.add_argument('-S', action='store_true')
-        parser.add_argument('-C', action='store_true')
-        parser.add_argument('-n', action='store_true')
-        parser.add_argument('-A', action='store_true')
-        parser.add_argument('-V', action='store_true')
+        parser.add_argument('-c', help="encoding", type=str, action='store', default='utf-8')
+        parser.add_argument('-s', help="scale", type=int, action='store', default=1)
+        parser.add_argument('-R', help="rotation", type=int, action='store', default=0)
+        parser.add_argument('-Y', help="layoutmode", type=str, choices=['normal', 'loose', 'exact'], action='store', default='normal')
+        parser.add_argument('-p', help="pagenos", type=int, action='store', default=set())
+        parser.add_argument('-m', help="maxpages", type=int, action='store', default=0)
+        parser.add_argument('-S', action='store_true', default=False)
+        parser.add_argument('-C', action='store_true', default=True)
+        parser.add_argument('-n', action='store_true', default=LAParams())
+        parser.add_argument('-A', action='store_true', default=False)
+        parser.add_argument('-V', action='store_true', default=False)
         parser.add_argument('-M', help='char_margin', type=float, action='store')
         parser.add_argument('-L', help="line_margin", type=float, action='store')
         parser.add_argument('-W', help="word_margin", type=float, action='store')
         parser.add_argument('-F', help="boxes_flow", type=float, action='store')
-        parser.add_argument('-d', nargs='+', default=[])
-        parser.add_argument('files', metavar='file', type=str, help='the files you want to convert', nargs='*', default=[])
+        parser.add_argument('-d', action='store_true')
+        parser.add_argument('files', metavar='file', help='the files you want to convert', nargs=argparse.REMAINDER, default=[])
         args = parser.parse_args(argv[1:])
     except argparse.ArgumentError:
         return usage()
@@ -106,7 +106,8 @@ def main(argv):
             elif outfile.endswith('.tag'):
                 outtype = 'tag'
     if outfile:
-        outfp = open(outfile, 'w+', encoding=encoding)
+        print(outfile)
+        outfp = open(outfile, 'w', encoding=encoding)
     else:
         outfp = sys.stdout
     if outtype == 'text':
@@ -124,8 +125,8 @@ def main(argv):
         device = TagExtractor(rsrcmgr, outfp)
     else:
         return usage()
+
     for fname in args.files:
-        print(args)
         with open(fname, 'rb') as fp:
             interpreter = PDFPageInterpreter(rsrcmgr, device)
             for page in PDFPage.get_pages(fp, pagenos,
