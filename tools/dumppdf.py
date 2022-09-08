@@ -148,6 +148,7 @@ def dumpoutline(outfp, fname, objids, pagenos, password=b'',
                         if subtype and repr(subtype) == '/GoTo' and action.get('D'):
                             dest = resolve_dest(action['D'])
                             pageno = pages[dest[0].objid]
+                s = q(title)
                 outfp.write('<outline level="%r" title="%s">\n' % (level, q(s)))
                 if dest is not None:
                     outfp.write('<dest>')
