@@ -7,7 +7,7 @@ from .utils import isnumber
 from .pdffont import PDFUnicodeNotDefined
 
 
-##  PDFDevice
+# PDFDevice
 ##
 class PDFDevice:
 
@@ -57,7 +57,7 @@ class PDFDevice:
         return
 
 
-##  PDFTextDevice
+# PDFTextDevice
 ##
 class PDFTextDevice(PDFDevice):
 
@@ -82,13 +82,23 @@ class PDFTextDevice(PDFDevice):
                 scaling, charspace, wordspace, rise, dxscale)
         return
 
-    def render_string_horizontal(self, seq, matrix, pos,
-                                 font, fontsize, scaling, charspace, wordspace, rise, dxscale):
+    def render_string_horizontal(
+            self,
+            seq,
+            matrix,
+            pos,
+            font,
+            fontsize,
+            scaling,
+            charspace,
+            wordspace,
+            rise,
+            dxscale):
         (x, y) = pos
         needcharspace = False
         for obj in seq:
             if isnumber(obj):
-                x -= obj*dxscale
+                x -= obj * dxscale
                 needcharspace = True
             else:
                 for cid in font.decode(obj):
@@ -101,13 +111,23 @@ class PDFTextDevice(PDFDevice):
                     needcharspace = True
         return (x, y)
 
-    def render_string_vertical(self, seq, matrix, pos,
-                               font, fontsize, scaling, charspace, wordspace, rise, dxscale):
+    def render_string_vertical(
+            self,
+            seq,
+            matrix,
+            pos,
+            font,
+            fontsize,
+            scaling,
+            charspace,
+            wordspace,
+            rise,
+            dxscale):
         (x, y) = pos
         needcharspace = False
         for obj in seq:
             if isnumber(obj):
-                y -= obj*dxscale
+                y -= obj * dxscale
                 needcharspace = True
             else:
                 for cid in font.decode(obj):
@@ -124,7 +144,7 @@ class PDFTextDevice(PDFDevice):
         return 0
 
 
-##  TagExtractor
+# TagExtractor
 ##
 class TagExtractor(PDFDevice):
 
