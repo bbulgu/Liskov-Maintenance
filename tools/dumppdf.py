@@ -166,7 +166,7 @@ def dumpoutline(outfp, fname, objids, pagenos, password=b'',
                             pageno = pages[dest[0].objid]
                 outfp.write(
                     '<outline level="%r" title="%s">\n' %
-                    (level, q(s)))
+                    (level, q(title)))
                 if dest is not None:
                     outfp.write('<dest>')
                     dumpxml(outfp, dest)

@@ -7,7 +7,7 @@ Tests the commandline part of pdf2txt.py
 
 
 def test_cmd():
-    commandline(['pdf2txt.py', '-P', 'test', '../sample.pdf'])
+    commandline(['pdf2txt.py', '-P', 'test', './sample.pdf'])
 
 
 """
@@ -16,7 +16,7 @@ Tests the pdf conversion part of pdf2txt.py
 
 
 def test_pdfconversion():
-    args = ['../sample.pdf']
+    args = ['./sample.pdf']
     password = b'test'
     pagenos = set()
     maxpages = 0
