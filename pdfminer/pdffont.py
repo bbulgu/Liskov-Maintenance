@@ -179,8 +179,8 @@ def getdict(data):
                 if b0 == 28:
                     value = b1 << 8 | b2
                 else:
-                    value = b1 << 24 | b2 << 16 | struct.unpack('>H', fp.read(2))[
-                        0]
+                    value = b1 << 24 | b2 << 16 | \
+                            struct.unpack('>H', fp.read(2))[0]
         stack.append(value)
     return d
 
@@ -296,7 +296,8 @@ class CFFFont:
         self.name = name
         self.fp = fp
         # Header
-        (_major, _minor, hdrsize, offsize) = struct.unpack('BBBB', self.fp.read(4))
+        (_major, _minor, hdrsize, offsize) = \
+            struct.unpack('BBBB', self.fp.read(4))
         self.fp.read(hdrsize - 4)
         # Name INDEX
         self.name_index = self.INDEX(self.fp)
@@ -438,7 +439,8 @@ class TrueTypeFont:
                     (firstcode, entcount, delta, offset) = struct.unpack(
                         '>HHhH', fp.read(8))
                     hdrs.append(
-                        (i, firstcode, entcount, delta, fp.tell() - 2 + offset))
+                        (i, firstcode, entcount, delta,
+                         fp.tell() - 2 + offset))
                 for (i, firstcode, entcount, delta, pos) in hdrs:
                     if not entcount:
                         continue
@@ -713,7 +715,7 @@ class PDFCIDFont(PDFFont):
             try:
                 self.unicode_map = CMapDB.get_unicode_map(
                     self.cidcoding, self.cmap.is_vertical())
-            except CMapDB.CMapNotFound as e:
+            except CMapDB.CMapNotFound:
                 pass
 
         self.vertical = self.cmap.is_vertical()
