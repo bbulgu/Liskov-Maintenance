@@ -94,7 +94,8 @@ class ImageWriter:
         if len(filters) == 1 and filters[0][0] in LITERALS_DCT_DECODE:
             ext = '.jpg'
         elif (image.bits == 1 or
-              image.bits == 8 and image.colorspace in (LITERAL_DEVICE_RGB, LITERAL_DEVICE_GRAY)):
+              image.bits == 8 and image.colorspace in (LITERAL_DEVICE_RGB,
+                                                       LITERAL_DEVICE_GRAY)):
             ext = '.%dx%d.bmp' % (width, height)
         else:
             ext = '.%d.%dx%d.img' % (image.bits, width, height)
