@@ -8,7 +8,6 @@
 #
 import sys
 import os.path
-import re
 from io import StringIO
 from pdfminer.psparser import PSKeyword, PSLiteral, LIT
 from pdfminer.pdfparser import PDFParser
@@ -198,7 +197,8 @@ def extractembedded(outfp, fname, objids, pagenos, password=b'',
                 (filename))
         if fileobj.get('Type') is not LITERAL_EMBEDDEDFILE:
             raise PDFValueError(
-                'unable to process PDF: reference for %r is not an EmbeddedFile' %
+                'unable to process PDF: reference for %r is not an '
+                'EmbeddedFile' %
                 (filename))
         path = os.path.join(extractdir, filename)
         if os.path.exists(path):
@@ -255,8 +255,8 @@ def main(argv):
 
     def usage():
         print(
-            f'usage: {argv[0]} [-P password] [-a] [-p pageid] [-i objid] [-o output] '
-            '[-r|-b|-t] [-T] [-O output_dir] [-d] input.pdf ...')
+            f'usage: {argv[0]} [-P password] [-a] [-p pageid] [-i objid] '
+            '[-o output] [-r|-b|-t] [-T] [-O output_dir] [-d] input.pdf ...')
         return 100
     try:
         (opts, args) = getopt.getopt(argv[1:], 'dP:ap:i:o:rbtTO:')

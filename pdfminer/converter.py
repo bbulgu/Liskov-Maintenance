@@ -289,12 +289,13 @@ class HTMLConverter(PDFConverter):
         if color is not None:
             self.write(
                 '<span style="position:absolute; border: %s %dpx solid; '
-                'left:%dpx; top:%dpx; width:%dpx; height:%dpx;"></span>\n' % (color,
-                                                                              borderwidth,
-                                                                              x * self.scale,
-                                                                              (self._yoffset - y) * self.scale,
-                                                                              w * self.scale,
-                                                                              h * self.scale))
+                'left:%dpx; top:%dpx; width:%dpx; height:%dpx;"></span>\n' %
+                (color,
+                    borderwidth,
+                    x * self.scale,
+                    (self._yoffset - y) * self.scale,
+                    w * self.scale,
+                    h * self.scale))
         return
 
     def place_border(self, color, borderwidth, item):
@@ -311,18 +312,23 @@ class HTMLConverter(PDFConverter):
         if self.imagewriter is not None:
             name = self.imagewriter.export_image(item)
             self.write(
-                '<img src="%s" border="%d" style="position:absolute; left:%dpx; top:%dpx;" '
-                'width="%d" height="%d" />\n' %
-                (q(name),
-                 borderwidth, x * self.scale, (self._yoffset - y) * self.scale, w
-                 * self.scale, h * self.scale))
+                '<img src="%s" border="%d" style="position:absolute; '
+                'left:%dpx; top:%dpx;" '
+                'width="%d" height="%d" />\n'
+                % (q(name),
+                   borderwidth,
+                   x * self.scale,
+                   (self._yoffset - y) * self.scale,
+                   w * self.scale,
+                   h * self.scale))
         return
 
     def place_text(self, color, text, x, y, size):
         color = self.text_colors.get(color)
         if color is not None:
             self.write(
-                '<span style="position:absolute; color:%s; left:%dpx; top:%dpx; font-size:%dpx;">' %
+                '<span style="position:absolute; color:%s; left:%dpx; '
+                'top:%dpx; font-size:%dpx;">' %
                 (color,
                  x *
                  self.scale,
@@ -340,10 +346,16 @@ class HTMLConverter(PDFConverter):
         self._fontstack.append(self._font)
         self._font = None
         self.write(
-            '<div style="position:absolute; border: %s %dpx solid; writing-mode:%s; '
+            '<div style="position:absolute; border: %s %dpx solid; '
+            'writing-mode:%s; '
             'left:%dpx; top:%dpx; width:%dpx; height:%dpx;">' %
-            (color, borderwidth, writing_mode, x * self.scale,
-             (self._yoffset - y) * self.scale, w * self.scale, h * self.scale))
+            (color,
+             borderwidth,
+             writing_mode,
+             x * self.scale,
+             (self._yoffset - y) * self.scale,
+             w * self.scale,
+             h * self.scale))
         return
 
     def end_div(self, color):
@@ -428,8 +440,11 @@ class HTMLConverter(PDFConverter):
                     elif isinstance(item, LTChar):
                         self.place_border('char', 1, item)
                         self.place_text(
-                            'char', item.get_text(),
-                            item.x0, item.y1, item.size)
+                            'char',
+                            item.get_text(),
+                            item.x0,
+                            item.y1,
+                            item.size)
                 else:
                     if isinstance(item, LTTextLine):
                         for child in item:
