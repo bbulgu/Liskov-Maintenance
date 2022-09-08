@@ -1,4 +1,4 @@
-from tools.pdf2txt import *
+from tools.pdf2txt import commandline, pdfconversion
 from pdfminer.layout import LAParams
 
 """
@@ -36,6 +36,6 @@ def test_pdfconversion():
     laparams.word_margin = 0.1
     laparams.all_texts = False
 
-    assert pdfconversion(args, password, pagenos, maxpages, outfile, outtype, imagewriter,
-                  rotation, stripcontrol, layoutmode, encoding, scale,
-                  caching, laparams, debug) == 0
+    assert pdfconversion(args, password, pagenos, maxpages, outfile, outtype,
+                         imagewriter, rotation, stripcontrol, layoutmode,
+                         encoding, scale, caching, laparams, debug) == 0
