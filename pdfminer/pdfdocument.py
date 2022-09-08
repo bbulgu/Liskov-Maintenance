@@ -486,9 +486,8 @@ class PDFStandardSecurityHandlerV4(PDFStandardSecurityHandler):
         return data
 
     def decrypt_aes128(self, objid, genno, data):
-        key = self.key + struct.pack('<L',
-                                     objid)[:3] + struct.pack('<L',
-                                                              genno)[:2] + b'sAlT'
+        key = self.key + struct.pack('<L', objid)[:3] + \
+              struct.pack('<L', genno)[:2] + b'sAlT'
         hash = md5.md5(key)
         key = hash.digest()[:min(len(key), 16)]
         return AES.new(key, mode=AES.MODE_CBC, IV=data[:16]).decrypt(data[16:])
@@ -609,7 +608,7 @@ class PDFDocument:
                 continue
             # If there's an encryption info, remember it.
             if 'Encrypt' in trailer:
-                #assert not self.encryption
+                # assert not self.encryption
                 self.encryption = (list_value(trailer['ID']),
                                    dict_value(trailer['Encrypt']))
                 self._initialize_password(password)
