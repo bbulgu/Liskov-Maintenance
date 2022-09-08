@@ -110,7 +110,8 @@ def main(argv):
                 page.rotate = (page.rotate+rotation) % 360
                 interpreter.process_page(page)
     device.close()
-    outfp.close()
+    if outfile:
+        outfp.close()
     return
 
 if __name__ == '__main__': sys.exit(main(sys.argv))
