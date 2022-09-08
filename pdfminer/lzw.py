@@ -71,12 +71,12 @@ class LZWDecoder:
                 x = self.table[code]
             else:
                 raise CorruptDataError
-            l = len(self.table)
-            if l == 511:
+            length = len(self.table)
+            if length == 511:
                 self.nbits = 10
-            elif l == 1023:
+            elif length == 1023:
                 self.nbits = 11
-            elif l == 2047:
+            elif length == 2047:
                 self.nbits = 12
             self.prevbuf = x
         return x
