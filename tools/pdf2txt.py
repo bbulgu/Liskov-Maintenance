@@ -28,7 +28,7 @@ def main(argv):
         parser.add_argument('-t', help="text", type=str, choices=['text', 'html', 'xml', 'tag'], action='store', default='text')
         parser.add_argument('-O', help="output_dir", type=str, action='store')
         parser.add_argument('-c', help="encoding", type=str, action='store', default='utf-8')
-        parser.add_argument('-s', help="scale", type=int, action='store', default=1)
+        parser.add_argument('-s', help="scale", type=float, action='store', default=1)
         parser.add_argument('-R', help="rotation", type=int, action='store', default=0)
         parser.add_argument('-Y', help="layoutmode", type=str, choices=['normal', 'loose', 'exact'], action='store', default='normal')
         parser.add_argument('-p', help="pagenos", type=int, action='store', default=set())
@@ -50,45 +50,32 @@ def main(argv):
     if not args.files:
         return usage()
     # debug option
-    debug = 0
+    debug = 1 if args.d else 0
     # input option
-    password = b''
+    password = args.p.encode('ascii') if args.p else b''
     pagenos = set()
-    maxpages = 0
+    if args.p:
+        pagenos.update(int(x) - 1 for x in args.p.split(','))
+    maxpages = int(args.m) if args.m else 0
     # output option
-    outfile = None
-    outtype = None
-    imagewriter = None
-    rotation = 0
-    stripcontrol = False
-    layoutmode = 'normal'
-    encoding = 'utf-8'
-    pageno = 1
-    scale = 1
-    caching = True
-    showpageno = True
-    laparams = LAParams()
-    for (k, v) in vars(args).items():
-        if k == '-d': debug += 1
-        elif k == '-P': password = v.encode('ascii')
-        elif k == '-o': outfile = v
-        elif k == '-t': outtype = v
-        elif k == '-O': imagewriter = ImageWriter(v)
-        elif k == '-c': encoding = v
-        elif k == '-s': scale = float(v)
-        elif k == '-R': rotation = int(v)
-        elif k == '-Y': layoutmode = v
-        elif k == '-p': pagenos.update( int(x)-1 for x in v.split(',') )
-        elif k == '-m': maxpages = int(v)
-        elif k == '-S': stripcontrol = True
-        elif k == '-C': caching = False
-        elif k == '-n': laparams = None
-        elif k == '-A': laparams.all_texts = True
-        elif k == '-V': laparams.detect_vertical = True
-        elif k == '-M': laparams.char_margin = float(v)
-        elif k == '-W': laparams.word_margin = float(v)
-        elif k == '-L': laparams.line_margin = float(v)
-        elif k == '-F': laparams.boxes_flow = float(v)
+    outfile = args.o if args.o else None
+    outtype = args.t if args.t else None
+    imagewriter = ImageWriter(args.O) if args.O else None
+    rotation = int(args.R) if args.R else 0
+    stripcontrol = args.S
+    layoutmode = args.Y
+    encoding = args.c
+    scale = float(args.s)
+    caching = not args.C
+    laparams = None if args.n else LAParams()
+    if laparams:
+        laparams.all_texts = args.A
+        laparams.detect_vertical = args.V
+        laparams.char_margin = args.M
+        laparams.word_margin = args.W
+        laparams.line_margin = args.L
+        laparams.boxes_flow = args.F
+
     #
     PDFDocument.debug = debug
     PDFParser.debug = debug
@@ -106,7 +93,6 @@ def main(argv):
             elif outfile.endswith('.tag'):
                 outtype = 'tag'
     if outfile:
-        print(outfile)
         outfp = open(outfile, 'w', encoding=encoding)
     else:
         outfp = sys.stdout
