@@ -35,7 +35,6 @@ class PSValueError(PSException):
 # PSObject
 ##
 class PSObject:
-
     """Base class for all PS or PDF-related data types."""
 
     pass
@@ -44,7 +43,6 @@ class PSObject:
 # PSLiteral
 ##
 class PSLiteral(PSObject):
-
     """A class that represents a PostScript literal.
 
     Postscript literals are used as identifiers, such as
@@ -67,7 +65,6 @@ class PSLiteral(PSObject):
 # PSKeyword
 ##
 class PSKeyword(PSObject):
-
     """A class that represents a PostScript keyword.
 
     PostScript keywords are a dozen of predefined words.
@@ -89,7 +86,6 @@ class PSKeyword(PSObject):
 # PSSymbolTable
 ##
 class PSSymbolTable:
-
     """A utility class for storing PSLiteral/PSKeyword objects.
 
     Interned objects can be checked its identity with "is" operator.
@@ -159,7 +155,6 @@ ESC_STRING = {
 
 
 class PSBaseParser:
-
     """Most basic PostScript parser that performs only tokenization.
     """
     BUFSIZ = 4096
@@ -443,7 +438,9 @@ class PSBaseParser:
             return j + 1
         if c == b')':
             self.paren -= 1
-            if self.paren:  # WTF, they said balanced parens need no special treatment.
+
+            # WTF, they said balanced parens need no special treatment.
+            if self.paren:
                 self._curtoken += c
                 return j + 1
         self._add_token(self._curtoken)
@@ -577,11 +574,12 @@ class PSStackParser(PSBaseParser):
         """Yields a list of objects.
 
         Returns keywords, literals, strings, numbers, arrays and dictionaries.
-        Arrays and dictionaries are represented as Python lists and dictionaries.
+        Arrays and dictionaries are represented as Python lists and
+        dictionaries.
         """
         while not self.results:
             (pos, token) = self.nexttoken()
-            #print((pos,token), (self.curtype, self.curstack))
+            # print((pos,token), (self.curtype, self.curstack))
             if isinstance(token, (int, float, bool, bytes, PSLiteral)):
                 # normal token
                 self.push((pos, token))
@@ -643,7 +641,6 @@ class PSStackParser(PSBaseParser):
 # Simplistic Test cases
 ##
 class TestPSBaseParser(unittest.TestCase):
-
     TESTDATA = br'''%!PS
 begin end
  "  @ #
@@ -666,15 +663,18 @@ func/a/b{(c)do*}def
 
     TOKENS = [
         (5, KWD(b'begin')), (11, KWD(b'end')), (16, KWD(b'"')), (19, KWD(b'@')),
-        (21, KWD(b'#')), (23, LIT('a')), (25, LIT('BCD')), (30, LIT('Some_Name')),
+        (21, KWD(b'#')), (23, LIT('a')), (25, LIT('BCD')),
+        (30, LIT('Some_Name')),
         (41, LIT('foo_xbaa')), (54, 0), (56, 1), (59, -2), (62, 0.5),
         (65, 1.234), (71, b'abc'), (77, b''), (80, b'abc ( def ) ghi'),
         (98, b'def \x00 4ghi'), (118, b'bach\\slask'), (132, b'foo\nbaa'),
-        (143, b'this % is not a comment.'), (170, b'foo\nbaa'), (180, b'foobaa'),
+        (143, b'this % is not a comment.'), (170, b'foo\nbaa'),
+        (180, b'foobaa'),
         (191, b''), (194, b' '), (199, b'@@ '), (211, b'\xab\xcd\x00\x124\x05'),
         (226, KWD(b'func')), (230, LIT('a')), (232, LIT('b')),
         (234, KWD(b'{')), (235, b'c'), (238, KWD(b'do*')), (241, KWD(b'}')),
-        (242, KWD(b'def')), (246, KWD(b'[')), (248, 1), (250, b'z'), (254, KWD(b'!')),
+        (242, KWD(b'def')), (246, KWD(b'[')), (248, 1), (250, b'z'),
+        (254, KWD(b'!')),
         (256, KWD(b']')), (258, KWD(b'<<')), (261, LIT('foo')), (266, b'bar'),
         (272, KWD(b'>>'))
     ]
@@ -684,7 +684,8 @@ func/a/b{(c)do*}def
         (41, LIT('foo_xbaa')), (54, 0), (56, 1), (59, -2), (62, 0.5),
         (65, 1.234), (71, b'abc'), (77, b''), (80, b'abc ( def ) ghi'),
         (98, b'def \x00 4ghi'), (118, b'bach\\slask'), (132, b'foo\nbaa'),
-        (143, b'this % is not a comment.'), (170, b'foo\nbaa'), (180, b'foobaa'),
+        (143, b'this % is not a comment.'), (170, b'foo\nbaa'),
+        (180, b'foobaa'),
         (191, b''), (194, b' '), (199, b'@@ '), (211, b'\xab\xcd\x00\x124\x05'),
         (230, LIT('a')), (232, LIT('b')), (234, [b'c']), (246, [1, b'z']),
         (258, {'foo': b'bar'}),
@@ -696,6 +697,7 @@ func/a/b{(c)do*}def
         class MyParser(PSBaseParser):
             def flush(self):
                 self.add_results(*self.popall())
+
         parser = MyParser(BytesIO(s))
         r = []
         try:
@@ -711,6 +713,7 @@ func/a/b{(c)do*}def
         class MyParser(PSStackParser):
             def flush(self):
                 self.add_results(*self.popall())
+
         parser = MyParser(BytesIO(s))
         r = []
         try:
