@@ -106,7 +106,7 @@ def commandline(argv):
     CMapDB.debug = debug
     PDFPageInterpreter.debug = debug
     #
-    pdfconversion(
+    return pdfconversion(
         args,
         password,
         pagenos,
@@ -191,12 +191,12 @@ def pdfconversion(
     if outfp != sys.stdout:
         outfp.close()
 
-    return
+    return 0
 
 
 # main
 def main(argv):
-    commandline(argv)
+    return commandline(argv)
 
 
 if __name__ == '__main__':

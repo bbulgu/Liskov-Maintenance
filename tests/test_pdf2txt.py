@@ -7,7 +7,7 @@ Tests the commandline part of pdf2txt.py
 
 
 def test_cmd():
-    commandline(['pdf2txt.py', '-P', 'test', './sample.pdf'])
+    assert commandline(['pdf2txt.py', '-P', 'test', './sample.pdf']) == 0
 
 
 """
@@ -36,6 +36,6 @@ def test_pdfconversion():
     laparams.word_margin = 0.1
     laparams.all_texts = False
 
-    pdfconversion(args, password, pagenos, maxpages, outfile, outtype, imagewriter,
+    assert pdfconversion(args, password, pagenos, maxpages, outfile, outtype, imagewriter,
                   rotation, stripcontrol, layoutmode, encoding, scale,
-                  caching, laparams, debug)
+                  caching, laparams, debug) == 0

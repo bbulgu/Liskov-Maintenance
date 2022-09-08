@@ -265,7 +265,8 @@ class HTMLConverter(PDFConverter):
     def write_header(self):
         self.write('<html><head>\n')
         self.write(
-            '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n')
+            '<meta http-equiv="Content-Type" content="text/html; '
+            + 'charset=utf-8">\n')
         self.write('</head><body>\n')
         return
 
@@ -311,12 +312,10 @@ class HTMLConverter(PDFConverter):
             name = self.imagewriter.export_image(item)
             self.write(
                 '<img src="%s" border="%d" style="position:absolute; left:%dpx; top:%dpx;" '
-                'width="%d" height="%d" />\n' % (q(name),
-                                                 borderwidth,
-                                                 x * self.scale,
-                                                 (self._yoffset - y) * self.scale,
-                                                 w * self.scale,
-                                                 h * self.scale))
+                'width="%d" height="%d" />\n' %
+                (q(name),
+                 borderwidth, x * self.scale, (self._yoffset - y) * self.scale, w
+                 * self.scale, h * self.scale))
         return
 
     def place_text(self, color, text, x, y, size):
@@ -342,13 +341,9 @@ class HTMLConverter(PDFConverter):
         self._font = None
         self.write(
             '<div style="position:absolute; border: %s %dpx solid; writing-mode:%s; '
-            'left:%dpx; top:%dpx; width:%dpx; height:%dpx;">' % (color,
-                                                                 borderwidth,
-                                                                 writing_mode,
-                                                                 x * self.scale,
-                                                                 (self._yoffset - y) * self.scale,
-                                                                 w * self.scale,
-                                                                 h * self.scale))
+            'left:%dpx; top:%dpx; width:%dpx; height:%dpx;">' %
+            (color, borderwidth, writing_mode, x * self.scale,
+             (self._yoffset - y) * self.scale, w * self.scale, h * self.scale))
         return
 
     def end_div(self, color):
@@ -433,7 +428,8 @@ class HTMLConverter(PDFConverter):
                     elif isinstance(item, LTChar):
                         self.place_border('char', 1, item)
                         self.place_text(
-                            'char', item.get_text(), item.x0, item.y1, item.size)
+                            'char', item.get_text(),
+                            item.x0, item.y1, item.size)
                 else:
                     if isinstance(item, LTTextLine):
                         for child in item:
