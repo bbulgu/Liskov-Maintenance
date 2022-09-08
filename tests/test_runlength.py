@@ -1,4 +1,4 @@
-from pdfminer.runlength import *
+from pdfminer.runlength import rldecode
 
 """
 Tests runlength decode with data provided by the former maintainer of
