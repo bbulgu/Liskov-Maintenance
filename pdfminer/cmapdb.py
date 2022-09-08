@@ -358,7 +358,7 @@ class CMapParser(PSStackParser):
                 s1 = nunpack(svar)
                 e1 = nunpack(evar)
                 vlen = len(svar)
-                #assert s1 <= e1
+                # assert s1 <= e1
                 for i in range(e1 - s1 + 1):
                     x = sprefix + struct.pack('>L', s1 + i)[-vlen:]
                     self.cmap.add_code2cid(x, cid + i)
@@ -385,7 +385,7 @@ class CMapParser(PSStackParser):
                     continue
                 s1 = nunpack(s)
                 e1 = nunpack(e)
-                #assert s1 <= e1
+                # assert s1 <= e1
                 if isinstance(code, list):
                     for i in range(e1 - s1 + 1):
                         self.cmap.add_cid2unichr(s1 + i, code[i])
@@ -601,7 +601,7 @@ def main(argv):
     for fname in args:
         with open(fname, 'rb') as fp:
             cmap = FileUnicodeMap()
-            #cmap = FileCMap()
+            # cmap = FileCMap()
             CMapParser(cmap, fp).run()
             cmap.dump()
     return
