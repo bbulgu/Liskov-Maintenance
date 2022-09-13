@@ -48,17 +48,17 @@ def main(argv):
                             action='store', default=0)
         parser.add_argument('-S', action='store_true', default=False)
         parser.add_argument('-C', action='store_true', default=True)
-        parser.add_argument('-n', action='store_true', default=LAParams())
+        parser.add_argument('-n', action='store_true', default=False)
         parser.add_argument('-A', action='store_true', default=False)
         parser.add_argument('-V', action='store_true', default=False)
         parser.add_argument('-M', help='char_margin',
-                            type=float, action='store')
+                            type=float, default=2.0)
         parser.add_argument('-L', help="line_margin",
-                            type=float, action='store')
+                            type=float, default=0.5)
         parser.add_argument('-W', help="word_margin",
-                            type=float, action='store')
+                            type=float, default=0.1)
         parser.add_argument('-F', help="boxes_flow",
-                            type=float, action='store')
+                            type=float, default=0.5)
         parser.add_argument('-d', action='store_true')
         parser.add_argument('files', metavar='file',
                             help='the files you want to convert',
@@ -86,21 +86,21 @@ def main(argv):
     encoding = args.c
     scale = float(args.s)
     caching = not args.C
-    laparams = None if args.n else LAParams()
-    if laparams:
+    print(args)
+    if args.n:
+        laparams = None
+    else:
+        laparams = LAParams()
         laparams.all_texts = args.A
         laparams.detect_vertical = args.V
         laparams.char_margin = args.M
         laparams.word_margin = args.W
         laparams.line_margin = args.L
         laparams.boxes_flow = args.F
-
-    #
     PDFDocument.debug = debug
     PDFParser.debug = debug
     CMapDB.debug = debug
     PDFPageInterpreter.debug = debug
-    #
     rsrcmgr = PDFResourceManager(caching=caching)
     if not outtype:
         outtype = 'text'
