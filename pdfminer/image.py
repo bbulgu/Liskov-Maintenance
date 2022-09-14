@@ -91,6 +91,8 @@ class ImageWriter:
         stream = image.stream
         filters = stream.get_filters()
         (width, height) = image.srcsize
+
+        ## TODO: filters of type zip does not support len() method 
         if len(filters) == 1 and filters[0][0] in LITERALS_DCT_DECODE:
             ext = '.jpg'
         elif (image.bits == 1 or
