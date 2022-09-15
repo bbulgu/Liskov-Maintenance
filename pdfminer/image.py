@@ -90,9 +90,10 @@ class ImageWriter:
     def export_image(self, image):
         stream = image.stream
         filters = stream.get_filters()
+        print(type(stream))
         (width, height) = image.srcsize
+        print(image)
 
-        ## TODO: filters of type zip does not support len() method 
         if len(filters) == 1 and filters[0][0] in LITERALS_DCT_DECODE:
             ext = '.jpg'
         elif (image.bits == 1 or
@@ -140,5 +141,5 @@ class ImageWriter:
                     bmp.write_line(y, data[i:i + width])
                     i += width
             else:
-                fp.write(stream.get_data())
+                fp.write(stream.get_rawdata())
         return name
