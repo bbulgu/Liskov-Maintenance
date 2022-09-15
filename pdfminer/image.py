@@ -104,6 +104,7 @@ class ImageWriter:
         name = image.name + ext
         path = os.path.join(self.outdir, name)
         with open(path, 'wb') as fp:
+            print(f"image bits: {image.bits}, image.colorspace: {image.colorspace}")
             if ext == '.jpg':
                 raw_data = stream.get_rawdata()
                 if LITERAL_DEVICE_CMYK in image.colorspace:
@@ -124,7 +125,8 @@ class ImageWriter:
                 for y in range(height):
                     bmp.write_line(y, data[i:i + width])
                     i += width
-            elif image.bits == 8 and image.colorspace is LITERAL_DEVICE_RGB:
+            elif image.bits == 8 and LITERAL_DEVICE_RGB in  image.colorspace:
+                print("HEJ")
                 bmp = BMPWriter(fp, 24, width, height)
                 data = stream.get_data()
                 i = 0
@@ -132,7 +134,7 @@ class ImageWriter:
                 for y in range(height):
                     bmp.write_line(y, data[i:i + width])
                     i += width
-            elif image.bits == 8 and image.colorspace is LITERAL_DEVICE_GRAY:
+            elif image.bits == 8 and LITERAL_DEVICE_GRAY in image.colorspace:
                 bmp = BMPWriter(fp, 8, width, height)
                 data = stream.get_data()
                 i = 0
