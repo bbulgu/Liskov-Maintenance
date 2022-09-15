@@ -93,7 +93,6 @@ class ImageWriter:
         print(type(stream))
         (width, height) = image.srcsize
         print(image)
-
         if len(filters) == 1 and filters[0][0] in LITERALS_DCT_DECODE:
             ext = '.jpg'
         elif (image.bits == 1 or
