@@ -12,8 +12,6 @@
 <textbox id="1" bbox="303.133,87.432,308.114,101.549">
 <textline bbox="303.133,87.432,308.114,101.549">
 <text font="HWPECH+LMRoman10-Regular" bbox="303.133,87.432,308.114,101.549" size="14.117">1</text>
-<text>
-</text>
 </textline>
 </textbox>
 <layout>
