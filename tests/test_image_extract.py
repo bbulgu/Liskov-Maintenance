@@ -1,7 +1,6 @@
 import os
 
-from tools.pdf2txt import *  # Importing all for now, TODO: change later for unambigous imports
-import sys
+from tools.pdf2txt import commandline
 
 PNG = 'samples/PNG.pdf'
 JPG = 'samples/JPG.pdf'

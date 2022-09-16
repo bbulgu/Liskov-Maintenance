@@ -58,7 +58,7 @@ def commandline(argv):
     scale = 1
     caching = True
     laparams = LAParams()
-    png=False
+    png = False
 
     for (k, v) in opts:
         if k == '-d':
@@ -105,7 +105,7 @@ def commandline(argv):
             laparams.boxes_flow = float(v)
     #
     if png:
-        imagewriter = ImageWriter(v, png=True)
+        imagewriter.set_png(True)
 
     PDFDocument.debug = debug
     PDFParser.debug = debug

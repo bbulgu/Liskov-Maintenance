@@ -80,6 +80,7 @@ class BMPWriter:
         self.fp.write(data)
         return
 
+
 class PngWriter:
     def __init__(self, fp, width, height, color):
         self.fp = fp
@@ -100,6 +101,7 @@ class PngWriter:
 
         self.image.save(fp=self.fp)
 
+
 # ImageWriter
 ##
 class ImageWriter:
@@ -110,6 +112,9 @@ class ImageWriter:
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
         return
+
+    def set_png(self, png):
+        self.png = png
 
     def export_image(self, image):
         stream = image.stream
@@ -130,12 +135,9 @@ class ImageWriter:
         name = image.name + ext
         path = os.path.join(self.outdir, name)
         with open(path, 'wb') as fp:
-            print(f"image bits: {image.bits}, image.colorspace: {image.colorspace}")
             if ext == '.jpg':
                 raw_data = stream.get_rawdata()
                 if LITERAL_DEVICE_CMYK in image.colorspace:
-                    from PIL import Image
-                    from PIL import ImageChops
                     ifp = BytesIO(raw_data)
                     i = Image.open(ifp)
                     i = ImageChops.invert(i)
@@ -157,7 +159,7 @@ class ImageWriter:
                         bmp.write_line(y, data[i:i + width])
                         i += width
 
-            elif image.bits == 8 and LITERAL_DEVICE_RGB in  image.colorspace:
+            elif image.bits == 8 and LITERAL_DEVICE_RGB in image.colorspace:
                 data = stream.get_data()
                 if self.png:
                     png = PngWriter(fp, width, height, 'RGB')
