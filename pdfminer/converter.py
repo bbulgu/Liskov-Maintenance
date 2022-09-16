@@ -569,8 +569,33 @@ class XMLConverter(PDFConverter):
                     for child in item:
                         render(child)
                 elif self.coordinates_type == 'w':
-                    start_coord = -1
-                    end_coord = -1
+                    coord = [0, 0, 0, 0]
+                    is_first = True
+                    size = 0
+                    font = ""
+                    txt = ""
+                    for child in item:
+                        if child._text == ' ' or child._text  == '\n':
+                            self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' % (
+                                q(font), bbox2str(tuple(coord)), size))
+                            self.write_text(txt)
+                            self.outfp.write('</text>\n')
+                            txt = ""
+                            is_first = True
+                            render(child)
+                            continue
+
+                        if is_first:
+                            coord[0] = child.bbox[0]
+                            coord[1] = child.bbox[1]
+                            size = child.size
+                            font = child.fontname
+                            is_first = False
+
+                        txt = txt + child._text
+                        coord[2] = child.bbox[2]
+                        coord[3] = child.bbox[3]
+
                 elif self.coordinates_type == 'l':
                     coord = item.bbox
                     txt = item.get_text()[:-1]
