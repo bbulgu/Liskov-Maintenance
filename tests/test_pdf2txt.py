@@ -46,14 +46,19 @@ def test_pdfconversion():
 
 
 """
-Test that usage() is called when pdf2txt doesn't have the right arguments.  
+Test that usage() is called when pdf2txt doesn't have the right arguments.
 """
+
+
 def test_xml_word_empty():
     assert commandline(['pdf2txt.py', '-t', 'xml']) == 100
+
 
 """
 Test that xml output is per character when the 'xml' argument is given.
 """
+
+
 def test_xml_char_no_specification(capfd):
     commandline(['pdf2txt.py', '-t', 'xml', 'samples/line.pdf'])
     out, err = capfd.readouterr()
@@ -63,9 +68,12 @@ def test_xml_char_no_specification(capfd):
 
     assert out == data
 
+
 """
 Test that xml output is per character when the 'xml-c' argument is given.
 """
+
+
 def test_xml_char(capfd):
     commandline(['pdf2txt.py', '-t', 'xml-c', 'samples/line.pdf'])
     out, err = capfd.readouterr()
@@ -75,9 +83,12 @@ def test_xml_char(capfd):
 
     assert out == data
 
+
 """
 Test that xml output is per word when the 'xml-w' argument is given.
 """
+
+
 def test_xml_word(capfd):
     commandline(['pdf2txt.py', '-t', 'xml-w', 'samples/line.pdf'])
     out, err = capfd.readouterr()
@@ -87,9 +98,12 @@ def test_xml_word(capfd):
 
     assert out == data
 
+
 """
 Test that xml output is per line when the 'xml-l' argument is given.
 """
+
+
 def test_xml_line(capfd):
     commandline(['pdf2txt.py', '-t', 'xml-l', 'samples/line.pdf'])
     out, err = capfd.readouterr()
