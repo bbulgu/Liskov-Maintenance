@@ -35,7 +35,7 @@ def commandline(argv):
 
     try:
         (opts, args) = getopt.getopt(
-            argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SCnAVM:W:L:F:')
+            argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SXCnAVM:W:L:F:')
     except getopt.GetoptError:
         return usage()
     if not args:
@@ -58,6 +58,7 @@ def commandline(argv):
     scale = 1
     caching = True
     laparams = LAParams()
+    png = False
 
     for (k, v) in opts:
         if k == '-d':
@@ -68,6 +69,8 @@ def commandline(argv):
             outfile = v
         elif k == '-t':
             outtype = v
+        elif k == '-X':
+            png = True
         elif k == '-O':
             imagewriter = ImageWriter(v)
         elif k == '-c':
@@ -101,6 +104,9 @@ def commandline(argv):
         elif k == '-F':
             laparams.boxes_flow = float(v)
     #
+    if png:
+        imagewriter.set_png(True)
+
     PDFDocument.debug = debug
     PDFParser.debug = debug
     CMapDB.debug = debug
