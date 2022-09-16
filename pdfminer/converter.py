@@ -565,10 +565,10 @@ class XMLConverter(PDFConverter):
                     '<textline bbox="%s">\n' %
                     bbox2str(
                         item.bbox))
-                if self.coordinates_type == 'c':
+                if self.coordinates_type == 'c':  # Output for every character
                     for child in item:
                         render(child)
-                elif self.coordinates_type == 'w':
+                elif self.coordinates_type == 'w':  # Output for every word
                     coord = [0, 0, 0, 0]
                     is_first = True
                     size = 0
@@ -597,7 +597,7 @@ class XMLConverter(PDFConverter):
                         coord[2] = child.bbox[2]
                         coord[3] = child.bbox[3]
 
-                elif self.coordinates_type == 'l':
+                elif self.coordinates_type == 'l':  # Output for every line
                     coord = item.bbox
                     txt = item.get_text()[:-1]
                     size = -1
