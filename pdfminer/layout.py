@@ -286,7 +286,6 @@ class LTChar(LTComponent, LTText):
         return True
 
 
-
 # LTContainer
 ##
 class LTContainer(LTComponent):

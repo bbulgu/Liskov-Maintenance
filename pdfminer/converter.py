@@ -485,7 +485,7 @@ class XMLConverter(PDFConverter):
     CONTROL = re.compile(r'[\x00-\x08\x0b-\x0c\x0e-\x1f]')
 
     def __init__(self, rsrcmgr, outfp, pageno=1,
-                 laparams=None, imagewriter=None, stripcontrol=False, 
+                 laparams=None, imagewriter=None, stripcontrol=False,
                  coordinates_type='c'):
         PDFConverter.__init__(
             self,
@@ -575,9 +575,10 @@ class XMLConverter(PDFConverter):
                     font = ""
                     txt = ""
                     for child in item:
-                        if child._text == ' ' or child._text  == '\n':
-                            self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' % (
-                                q(font), bbox2str(tuple(coord)), size))
+                        if child._text == ' ' or child._text == '\n':
+                            self.outfp.write(
+                                '<text font="%s" bbox="%s" size="%.3f">' % (
+                                    q(font), bbox2str(tuple(coord)), size))
                             self.write_text(txt)
                             self.outfp.write('</text>\n')
                             txt = ""
@@ -605,8 +606,8 @@ class XMLConverter(PDFConverter):
                         size = child.size
                         font = child.fontname
                         break
-                    self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' % (
-                        q(font), bbox2str(coord), size))
+                    self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' %
+                                     (q(font), bbox2str(coord), size))
                     self.write_text(txt)
                     self.outfp.write('</text>\n')
 
