@@ -485,7 +485,8 @@ class XMLConverter(PDFConverter):
     CONTROL = re.compile(r'[\x00-\x08\x0b-\x0c\x0e-\x1f]')
 
     def __init__(self, rsrcmgr, outfp, pageno=1,
-                 laparams=None, imagewriter=None, stripcontrol=False):
+                 laparams=None, imagewriter=None, stripcontrol=False, 
+                 coordinates_type='c'):
         PDFConverter.__init__(
             self,
             rsrcmgr,
@@ -495,6 +496,7 @@ class XMLConverter(PDFConverter):
         self.imagewriter = imagewriter
         self.stripcontrol = stripcontrol
         self.write_header()
+        self.coordinates_type = coordinates_type
         return
 
     def write_header(self):
