@@ -165,7 +165,13 @@ def pdfconversion(
     elif outtype == 'xml':
         device = XMLConverter(rsrcmgr, outfp, laparams=laparams,
                               imagewriter=imagewriter,
-                              stripcontrol=stripcontrol)
+                              stripcontrol=stripcontrol) 
+    elif 'xml' in outtype:
+        coor_type = outtype[-1]
+        device = XMLConverter(rsrcmgr, outfp, laparams=laparams,
+                              imagewriter=imagewriter,
+                              stripcontrol=stripcontrol, 
+                              coordinates_type = coor_type)
     elif outtype == 'html':
         device = HTMLConverter(rsrcmgr, outfp, scale=scale,
                                layoutmode=layoutmode, laparams=laparams,

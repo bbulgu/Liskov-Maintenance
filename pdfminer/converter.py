@@ -565,8 +565,26 @@ class XMLConverter(PDFConverter):
                     '<textline bbox="%s">\n' %
                     bbox2str(
                         item.bbox))
-                for child in item:
-                    render(child)
+                if self.coordinates_type == 'c':
+                    for child in item:
+                        render(child)
+                elif self.coordinates_type == 'w':
+                    start_coord = -1
+                    end_coord = -1
+                elif self.coordinates_type == 'l':
+                    coord = item.bbox
+                    txt = item.get_text()[:-1]
+                    size = -1
+                    font = ""
+                    for child in item:
+                        size = child.size
+                        font = child.fontname
+                        break
+                    self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' % (
+                        q(font), bbox2str(coord), size))
+                    self.write_text(txt)
+                    self.outfp.write('</text>\n')
+
                 self.outfp.write('</textline>\n')
             elif isinstance(item, LTTextBox):
                 wmode = ''
