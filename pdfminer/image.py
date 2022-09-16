@@ -3,6 +3,10 @@ import struct
 import os
 import os.path
 from io import BytesIO
+
+from PIL import Image
+from PIL import ImageChops
+
 from .pdftypes import LITERALS_DCT_DECODE
 from .pdfcolor import LITERAL_DEVICE_GRAY
 from .pdfcolor import LITERAL_DEVICE_RGB
@@ -76,13 +80,33 @@ class BMPWriter:
         self.fp.write(data)
         return
 
+class PngWriter:
+    def __init__(self, fp, width, height, color):
+        self.fp = fp
+        self.color = color
+        self.image = Image.new(color, (width, height))
+
+    def write(self, data):
+        if self.color == 'RGB':
+            r = data[0::3]
+            g = data[1::3]
+            b = data[2::3]
+
+            self.image.putdata(list(zip(r, g, b)))
+        elif self.color == '1':
+            self.image.putdata(data)
+        elif self.color == 'L':
+            self.image.putdata(data)
+
+        self.image.save(fp=self.fp)
 
 # ImageWriter
 ##
 class ImageWriter:
 
-    def __init__(self, outdir):
+    def __init__(self, outdir, png=False):
         self.outdir = outdir
+        self.png = png
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
         return
@@ -99,6 +123,8 @@ class ImageWriter:
               image.bits == 8 and image.colorspace in (LITERAL_DEVICE_RGB,
                                                        LITERAL_DEVICE_GRAY)):
             ext = '.%dx%d.bmp' % (width, height)
+        elif self.png:
+            ext = '.%d.%dx%d.png' % (image.bits, width, height)
         else:
             ext = '.%d.%dx%d.img' % (image.bits, width, height)
         name = image.name + ext
@@ -117,30 +143,45 @@ class ImageWriter:
                     i.save(fp, 'JPEG')
                 else:
                     fp.write(raw_data)
+
             elif image.bits == 1:
-                bmp = BMPWriter(fp, 1, width, height)
                 data = stream.get_data()
-                i = 0
-                width = (width + 7) // 8
-                for y in range(height):
-                    bmp.write_line(y, data[i:i + width])
-                    i += width
+                if self.png:
+                    png = PngWriter(fp, width, height, '1')
+                    png.write(data)
+                else:
+                    bmp = BMPWriter(fp, 1, width, height)
+                    i = 0
+                    width = (width + 7) // 8
+                    for y in range(height):
+                        bmp.write_line(y, data[i:i + width])
+                        i += width
+
             elif image.bits == 8 and LITERAL_DEVICE_RGB in  image.colorspace:
-                print("HEJ")
-                bmp = BMPWriter(fp, 24, width, height)
                 data = stream.get_data()
-                i = 0
-                width = width * 3
-                for y in range(height):
-                    bmp.write_line(y, data[i:i + width])
-                    i += width
+                if self.png:
+                    png = PngWriter(fp, width, height, 'RGB')
+                    png.write(data)
+                else:
+                    bmp = BMPWriter(fp, 24, width, height)
+
+                    i = 0
+                    width = width * 3
+                    for y in range(height):
+                        bmp.write_line(y, data[i:i + width])
+                        i += width
+
             elif image.bits == 8 and LITERAL_DEVICE_GRAY in image.colorspace:
-                bmp = BMPWriter(fp, 8, width, height)
                 data = stream.get_data()
-                i = 0
-                for y in range(height):
-                    bmp.write_line(y, data[i:i + width])
-                    i += width
+                if self.png:
+                    png = PngWriter(fp, width, height, 'L')
+                    png.write(data)
+                else:
+                    bmp = BMPWriter(fp, 8, width, height)
+                    i = 0
+                    for y in range(height):
+                        bmp.write_line(y, data[i:i + width])
+                        i += width
             else:
                 fp.write(stream.get_rawdata())
         return name

@@ -209,3 +209,7 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # End of JetBrains .gitignore
+
+tests/output-pictures/
+tests/test_jpg
+tests/test_png
