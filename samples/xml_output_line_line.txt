@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages>
+<page id="1" bbox="0.000,0.000,612.000,792.000" rotate="0">
+<textbox id="0" bbox="133.410,637.370,278.884,669.419">
+<textline bbox="133.410,655.302,190.555,669.419">
+<text font="HWPECH+LMRoman10-Regular" bbox="133.410,655.302,190.555,669.419" size="14.117">This is a test</text>
+</textline>
+<textline bbox="133.410,637.370,278.884,651.487">
+<text font="HWPECH+LMRoman10-Regular" bbox="133.410,637.370,278.884,651.487" size="14.117">This is the second line of the test</text>
+</textline>
+</textbox>
+<textbox id="1" bbox="303.133,87.432,308.114,101.549">
+<textline bbox="303.133,87.432,308.114,101.549">
+<text font="HWPECH+LMRoman10-Regular" bbox="303.133,87.432,308.114,101.549" size="14.117">1</text>
+<text>
+</text>
+</textline>
+</textbox>
+<layout>
+<textgroup bbox="133.410,87.432,308.114,669.419">
+<textbox id="0" bbox="133.410,637.370,278.884,669.419" />
+<textbox id="1" bbox="303.133,87.432,308.114,101.549" />
+</textgroup>
+</layout>
+</page>
+</pages>
