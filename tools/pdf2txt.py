@@ -16,9 +16,9 @@ Prints how the tool should be used.
 
 
 def usage():
-    print('usage: pdf2txt.py [-P password] [-o output] [-t text|html|xml|tag]'
-          ' [-O output_dir] [-c encoding] [-s scale] [-R rotation]'
-          ' [-Y normal|loose|exact] [-p pagenos] [-m maxpages]'
+    print('usage: pdf2txt.py [-P password] [-o output] [-O output_dir]'
+          ' [-t text|html|xml|tag|xml-c|xml-w|xml-l] [-c encoding] [-s scale]'
+          ' [-R rotation] [-Y normal|loose|exact] [-p pagenos] [-m maxpages]'
           ' [-S] [-C] [-n] [-A] [-V] [-M char_margin] [-L line_margin]'
           ' [-W word_margin] [-F boxes_flow] [-d] input.pdf ...')
     return 100

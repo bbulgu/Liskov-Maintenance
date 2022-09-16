@@ -60,7 +60,7 @@ def test_xml_char_no_specification(capfd):
 
 
 def test_xml_char(capfd):
-    commandline(['pdf2txt.py', '-t', 'xml|c', 'samples/line.pdf'])
+    commandline(['pdf2txt.py', '-t', 'xml-c', 'samples/line.pdf'])
     out, err = capfd.readouterr()
 
     with open('samples/xml_output_line_char.txt', 'r') as file:
@@ -70,7 +70,7 @@ def test_xml_char(capfd):
 
 
 def test_xml_word(capfd):
-    commandline(['pdf2txt.py', '-t', 'xml|w', 'samples/line.pdf'])
+    commandline(['pdf2txt.py', '-t', 'xml-w', 'samples/line.pdf'])
     out, err = capfd.readouterr()
 
     with open('samples/xml_output_line_word.txt', 'r') as file:
@@ -80,7 +80,7 @@ def test_xml_word(capfd):
 
 
 def test_xml_line(capfd):
-    commandline(['pdf2txt.py', '-t', 'xml|l', 'samples/line.pdf'])
+    commandline(['pdf2txt.py', '-t', 'xml-l', 'samples/line.pdf'])
     out, err = capfd.readouterr()
 
     with open('samples/xml_output_line_line.txt', 'r') as file:
