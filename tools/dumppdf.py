@@ -19,7 +19,6 @@ from pdfminer.utils import isnumber, q
 from tools import pdf2txt
 
 
-
 ESCAPE = set(map(ord, '&<>"'))
 
 
@@ -130,18 +129,14 @@ def dumpallobjs(out, doc, mode=None):
     out.write('</pdf>')
     return
 
+
 def resolve_dest(dest, doc):
-    """
-    if isinstance(dest, bytes):
-        dest = dest.decode('UTF-8')
-    """
     if isinstance(dest, str):
         dest = resolve1(doc.get_dest(dest))
     elif isinstance(dest, PSLiteral):
         dest = resolve1(doc.get_dest(dest.name))
     if isinstance(dest, dict):
-        dest = dest['D']
-    
+        dest = dest['D']    
     return dest
 
 
@@ -163,26 +158,26 @@ def get_page_number(dest, doc, pages, a):
 
 def extract_outline_info(pages, outlines, doc, outfp, dest_info):
     for (level, title, dest, a, se) in outlines:
-                pageno = None
-                if dest:
-                    dest = resolve_dest(dest, doc)
+        pageno = None
+        if dest:
+            dest = resolve_dest(dest, doc)
+            pageno = pages[dest[0].objid]
+        elif a:
+            action = a.resolve()
+            if isinstance(action, dict):
+                subtype = action.get('S')
+                if subtype and repr(
+                        subtype) == '/GoTo' and action.get('D'):
+                    dest = resolve_dest(action['D'], doc)
                     pageno = pages[dest[0].objid]
-                elif a:
-                    action = a.resolve()
-                    if isinstance(action, dict):
-                        subtype = action.get('S')
-                        if subtype and repr(
-                                subtype) == '/GoTo' and action.get('D'):
-                            dest = resolve_dest(action['D'], doc)
-                            pageno = pages[dest[0].objid]
-                s = q(title)
-                outfp.write('<outline level="%r" title="%s">\n' %
-                            (level, q(s)))
-                if (dest_info):
-                    get_dest_info(dest, outfp)
-                if pageno is not None:
-                    outfp.write('<pageno>%r</pageno>\n' % pageno)
-                outfp.write('</outline>\n')
+        s = q(title)
+        outfp.write('<outline level="%r" title="%s">\n' %
+                    (level, q(s)))
+        if (dest_info):
+            get_dest_info(dest, outfp)
+        if pageno is not None:
+            outfp.write('<pageno>%r</pageno>\n' % pageno)
+        outfp.write('</outline>\n')
 
 def get_dest_info(dest, outfp):
     if dest is not None:
@@ -190,7 +185,24 @@ def get_dest_info(dest, outfp):
         dumpxml(outfp, dest)
         outfp.write('</dest>\n')
 
-def get_outlines(fname, target_title, outname, password = b''):
+"""
+A helper to generate a page string given start and end pages
+A comma separated string of page numbers (required for pdf2txt)
+Adds an offset of 1 since pdfminer starts on page 0
+"""
+def generate_page_string(start_page, end_page):
+    st = ''
+    for i in range(start_page+1, end_page+1):
+        st += f'{i}, '
+    st += str(end_page+1)
+    return st
+
+"""
+Writes the text belonging to a particular outline specified by the target_title,
+to a file called outname and reads the pdf from a file called fname. Optionally 
+takes in a password to open an encrypted pdf.
+"""
+def get_outlines_text(fname, target_title, outname, password = b''):
     with open(fname, 'rb') as fp:
         parser = PDFParser(fp)
         doc = PDFDocument(parser, password)
@@ -203,46 +215,48 @@ def get_outlines(fname, target_title, outname, password = b''):
             end_page = None
             end_title = None
             for (x, title, dest, a, y) in outlines:
-                if (title == target_title):
+                if (title == target_title):      # where to start reading
                     start_page = get_page_number(dest, doc, pages, a)
-                elif start_page:
+                elif start_page:                 # we've already found the outline to start reading from,
+                                                 # the next one is where we stop reading
                     end_page = get_page_number(dest, doc, pages, a)
                     end_title = title
                     break
 
-            if not start_page:  ## couldn't find outline, return
+            if not start_page:  # couldn't find outline, return
                 return
 
-            if not end_page:
+            if not end_page:    # if the outline we want to extract is the last one
                 end_page = len(pages)
 
-            st = ''
-            for i in range(start_page+1, end_page+1):
-                st += f'{i}, '
-            st += str(end_page+1)
+            st = generate_page_string(start_page, end_page)  
 
+            # write the text of the pdf document to a temporary file
             pdf2txt.main(['pdf2txt.py', '-o', 
                   'tests/extracted.txt', '-p', st, fname])
 
+            # read that file to extract the text between the two outlines
             with open('tests/extracted.txt', 'r', encoding='utf8') as fp:
                 lines = fp.readlines()
                 started_writing = False
                 with open(outname, 'w+', encoding='utf8') as outfp:
-                    for line in lines:   
+                    for line in lines:  
                         line = line.replace("  ", " ") 
                         if end_title == line.rstrip():
                             break
                         if target_title == line.rstrip():
-                            started_writing = True                        
+                            started_writing = True          
                         if started_writing:
                             outfp.write(line)
+
+            # remove the temporary file, since we don't need it anymore
+            os.remove("tests/extracted.txt")
 
         except PDFNoOutlines:
             pass
         parser.close()
     return
 
-# dumpoutline
 
 def dumpoutline(outfp, fname, objids, pagenos, password=b'',
                 dumpall=False, mode=None, extractdir=None, dest_info=True):
