@@ -190,7 +190,7 @@ def get_dest_info(dest, outfp):
         dumpxml(outfp, dest)
         outfp.write('</dest>\n')
 
-def get_outlines(fname, password, target_title):
+def get_outlines(fname, target_title, outname, password = b''):
     with open(fname, 'rb') as fp:
         parser = PDFParser(fp)
         doc = PDFDocument(parser, password)
@@ -202,20 +202,24 @@ def get_outlines(fname, password, target_title):
             start_page = None
             end_page = None
             end_title = None
-            for (level, title, dest, a, se) in outlines:
+            for (x, title, dest, a, y) in outlines:
                 if (title == target_title):
                     start_page = get_page_number(dest, doc, pages, a)
                 elif start_page:
                     end_page = get_page_number(dest, doc, pages, a)
                     end_title = title
                     break
-            if start_page and (not end_page):
+
+            if not start_page:  ## couldn't find outline, return
+                return
+
+            if not end_page:
                 end_page = len(pages)
 
             st = ''
-            for i in range(start_page, end_page):
+            for i in range(start_page+1, end_page+1):
                 st += f'{i}, '
-            st += end_page
+            st += str(end_page+1)
 
             pdf2txt.main(['pdf2txt.py', '-o', 
                   'tests/extracted.txt', '-p', st, fname])
@@ -223,13 +227,15 @@ def get_outlines(fname, password, target_title):
             with open('tests/extracted.txt', 'r', encoding='utf8') as fp:
                 lines = fp.readlines()
                 started_writing = False
-                for line in lines:
-                    if line == target_title:
-                        started_writing = True
-                    if started_writing:
-                        outfp.write(line)
-
-
+                with open(outname, 'w+', encoding='utf8') as outfp:
+                    for line in lines:   
+                        line = line.replace("  ", " ") 
+                        if end_title == line.rstrip():
+                            break
+                        if target_title == line.rstrip():
+                            started_writing = True                        
+                        if started_writing:
+                            outfp.write(line)
 
         except PDFNoOutlines:
             pass
