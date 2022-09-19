@@ -9,6 +9,7 @@ from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
 from pdfminer.cmapdb import CMapDB
 from pdfminer.layout import LAParams
 from pdfminer.image import ImageWriter
+from tools.dumppdf import dumpoutline
 
 """
 Prints how the tool should be used.
@@ -28,6 +29,24 @@ def usage():
 Extracts the commandline arguments and declares them to independant variables
 and calls pdfconversion with the corresponding arguments
 """
+
+
+
+def extract_outline(outline_name, file):
+    output_results = open('tests/extracted_outlines.txt', 'w+')
+    dumpoutline(output_results, file, None, None, dest_info = False)
+    output_results.close()
+    """
+    output_results = open('tests/extracted_outlines.txt', 'r')
+    lines = output_results.readlines()
+    for line in lines:
+        if line == outline_name:
+            
+    
+
+
+    return
+    """
 
 
 def commandline(argv):

@@ -128,32 +128,26 @@ def dumpallobjs(out, doc, mode=None):
     out.write('</pdf>')
     return
 
-# dumpoutline
+def resolve_dest(dest, doc):
+    """
+    if isinstance(dest, bytes):
+        dest = dest.decode('UTF-8')
+    """
+    if isinstance(dest, str):
+        dest = resolve1(doc.get_dest(dest))
+    elif isinstance(dest, PSLiteral):
+        dest = resolve1(doc.get_dest(dest.name))
+    if isinstance(dest, dict):
+        dest = dest['D']
+    
+    return dest
 
 
-def dumpoutline(outfp, fname, objids, pagenos, password=b'',
-                dumpall=False, mode=None, extractdir=None):
-    with open(fname, 'rb') as fp:
-        parser = PDFParser(fp)
-        doc = PDFDocument(parser, password)
-        pages = dict((page.pageid, pageno) for (pageno, page)
-                     in enumerate(PDFPage.create_pages(doc)))
-
-        def resolve_dest(dest):
-            if isinstance(dest, str):
-                dest = resolve1(doc.get_dest(dest))
-            elif isinstance(dest, PSLiteral):
-                dest = resolve1(doc.get_dest(dest.name))
-            if isinstance(dest, dict):
-                dest = dest['D']
-            return dest
-        try:
-            outlines = doc.get_outlines()
-            outfp.write('<outlines>\n')
-            for (level, title, dest, a, se) in outlines:
+def extract_outline_info(pages, outlines, doc, outfp, dest_info):
+    for (level, title, dest, a, se) in outlines:
                 pageno = None
                 if dest:
-                    dest = resolve_dest(dest)
+                    dest = resolve_dest(dest, doc)
                     pageno = pages[dest[0].objid]
                 elif a:
                     action = a.resolve()
@@ -161,18 +155,37 @@ def dumpoutline(outfp, fname, objids, pagenos, password=b'',
                         subtype = action.get('S')
                         if subtype and repr(
                                 subtype) == '/GoTo' and action.get('D'):
-                            dest = resolve_dest(action['D'])
+                            dest = resolve_dest(action['D'], doc)
                             pageno = pages[dest[0].objid]
                 s = q(title)
                 outfp.write('<outline level="%r" title="%s">\n' %
                             (level, q(s)))
-                if dest is not None:
-                    outfp.write('<dest>')
-                    dumpxml(outfp, dest)
-                    outfp.write('</dest>\n')
+                if (dest_info):
+                    get_dest_info(dest, outfp)
                 if pageno is not None:
                     outfp.write('<pageno>%r</pageno>\n' % pageno)
                 outfp.write('</outline>\n')
+
+def get_dest_info(dest, outfp):
+    if dest is not None:
+        outfp.write('<dest>')
+        dumpxml(outfp, dest)
+        outfp.write('</dest>\n')
+
+# dumpoutline
+
+def dumpoutline(outfp, fname, objids, pagenos, password=b'',
+                dumpall=False, mode=None, extractdir=None, dest_info=True):
+    with open(fname, 'rb') as fp:
+        parser = PDFParser(fp)
+        doc = PDFDocument(parser, password)
+        pages = dict((page.pageid, pageno) for (pageno, page)
+                     in enumerate(PDFPage.create_pages(doc)))
+
+        try:
+            outlines = doc.get_outlines()
+            outfp.write('<outlines>\n')
+            extract_outline_info(pages, outlines, doc, outfp, dest_info)
             outfp.write('</outlines>\n')
         except PDFNoOutlines:
             pass
