@@ -16,6 +16,8 @@ from pdfminer.pdftypes import PDFObjectNotFound, PDFValueError
 from pdfminer.pdftypes import PDFStream, PDFObjRef, resolve1, stream_value
 from pdfminer.pdfpage import PDFPage
 from pdfminer.utils import isnumber, q
+from tools import pdf2txt
+
 
 
 ESCAPE = set(map(ord, '&<>"'))
@@ -143,6 +145,22 @@ def resolve_dest(dest, doc):
     return dest
 
 
+def get_page_number(dest, doc, pages, a):
+    pageno = None
+    if dest:
+        dest = resolve_dest(dest, doc)
+        pageno = pages[dest[0].objid]
+    elif a:
+        action = a.resolve()
+        if isinstance(action, dict):
+            subtype = action.get('S')
+            if subtype and repr(
+                    subtype) == '/GoTo' and action.get('D'):
+                dest = resolve_dest(action['D'], doc)
+                pageno = pages[dest[0].objid]
+    return pageno
+
+
 def extract_outline_info(pages, outlines, doc, outfp, dest_info):
     for (level, title, dest, a, se) in outlines:
                 pageno = None
@@ -171,6 +189,52 @@ def get_dest_info(dest, outfp):
         outfp.write('<dest>')
         dumpxml(outfp, dest)
         outfp.write('</dest>\n')
+
+def get_outlines(fname, password, target_title):
+    with open(fname, 'rb') as fp:
+        parser = PDFParser(fp)
+        doc = PDFDocument(parser, password)
+        pages = dict((page.pageid, pageno) for (pageno, page)
+                     in enumerate(PDFPage.create_pages(doc)))
+
+        try:
+            outlines = doc.get_outlines()
+            start_page = None
+            end_page = None
+            end_title = None
+            for (level, title, dest, a, se) in outlines:
+                if (title == target_title):
+                    start_page = get_page_number(dest, doc, pages, a)
+                elif start_page:
+                    end_page = get_page_number(dest, doc, pages, a)
+                    end_title = title
+                    break
+            if start_page and (not end_page):
+                end_page = len(pages)
+
+            st = ''
+            for i in range(start_page, end_page):
+                st += f'{i}, '
+            st += end_page
+
+            pdf2txt.main(['pdf2txt.py', '-o', 
+                  'tests/extracted.txt', '-p', st, fname])
+
+            with open('tests/extracted.txt', 'r', encoding='utf8') as fp:
+                lines = fp.readlines()
+                started_writing = False
+                for line in lines:
+                    if line == target_title:
+                        started_writing = True
+                    if started_writing:
+                        outfp.write(line)
+
+
+
+        except PDFNoOutlines:
+            pass
+        parser.close()
+    return
 
 # dumpoutline
 

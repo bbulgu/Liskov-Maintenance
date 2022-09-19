@@ -14,12 +14,17 @@ able to get articles. Librarians should also understand the risks that Sci-Hub c
 pose to their patrons, their institutions, and themselves."""
 
 def test_extract_outline():
-    pdf2txt.extract_outline("", 'samples/sci.pdf')
+
+    pdf2txt.main(['pdf2txt.py', '-o', 
+                  'tests/extracted.txt', '-p', '2', 'samples/sci.pdf'])
+    
+    with open('tests/extracted.txt', 'r', encoding='utf8') as fp:
+        lines = fp.readlines()
+        for line in lines:
+            print(line)
 
 
     """
-    pdf2txt.main(['pdf2txt.py', '-o', 
-                  'tests/sci.txt', '-p', '2, 3, 4', 'samples/sci.pdf'])
     dumppdf.main(['dumppdf.py', '-t', 'samples/sci.pdf'])
     
     with open('tests/results/sci.txt') as outfile_new:

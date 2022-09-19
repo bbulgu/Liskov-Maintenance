@@ -1,0 +1,60 @@
+MEDICAL  REFERENCE  SERVICES  QUARTERLY 
+2017,  VOL.  36,  NO.  1,  73–78 
+http://dx.doi.org/10.1080/02763869.2017.1259918 
+
+EMERGING  TECHNOLOGIES  
+Matthew  B. Hoy  and  Tara Brigham,  Column Editors                                            
+Sci-Hub:  What  Librarians  Should  Know  and  Do  about 
+Article  Piracy 
+Matthew  B.  Hoy 
+
+Mayo  Clinic  Health  System–Eau  Claire,  Eau  Claire,  Wisconsin,  USA  
+
+KEYWORDS  
+Academic  publishing; 
+copyright;  piracy;  proxies; 
+Sci-Hub  
+
+ABSTRACT 
+The high cost of journal articles has driven many researchers to 
+turn  to  a  new  way  of  getting  access:  “pirate”  article  sites.  Sci- 
+Hub, the largest and best known of these sites, currently offers 
+instant  access  to  more  than  58  million  journal  articles.  Users 
+attracted by the ease of use and breadth of the collection may 
+not  realize  that  these  articles  are  often  obtained  using  stolen 
+credentials  and  downloading  them  may  be  illegal.  This  article 
+will  briefly  describe  Sci-Hub  and  how  it  works,  the  legal  and 
+ethical  issues  it  raises,  and  the  problems  it  may  cause  for 
+librarians. Librarians should be aware of Sci-Hub and the ways it 
+may  change  their  patrons’  expectations.  They  should  also 
+understand the risks Sci-Hub can pose to their patrons and their 
+institutions. 
+
+Introduction 
+Prices for academic journals, particularly science journals, have been on the rise 
+for  decades.1  For  researchers  without  access  to  an  institutional  library,  these 
+cost increases have come to mean paying $30 or more for each journal article 
+they  need  to  read.  When  they  need  to  read  hundreds  of  papers,  these  costs 
+quickly become unmanageable. In 2011, a researcher in Kazakhstan created a 
+website  call  Sci-Hub  that  allows  anyone  to  access  the  full  text  of  millions  of 
+scientific articles for free. Librarians should be aware of Sci-Hub because many 
+of their patrons are already using it, and it will undoubtedly affect their expec-
+tations about what their library should provide and how quickly they should be 
+able to get articles. Librarians should also understand the risks that Sci-Hub can 
+pose to their patrons, their institutions, and themselves. 
+
+What  is  SCI-HUB? 
+The tagline on the Sci-Hub website reads “to remove all barriers in the way of 
+science,” and the site’s “about” section describes it as “the first pirate website 
+
+CONTACT  Matthew  B.  Hoy,  MLIS,  AHIP 
+System–Eau  Claire,  1221  Whipple  Street,  Eau  Claire,  WI  54701,  USA. 
+Comments and suggestions should be sent to the Column Editors: Matthew B. Hoy (hoy.matt@mayo.edu) and Tara 
+Brigham  (Brigham.Tara@mayo.edu).  
+Published  with  license  by  Taylor  &  Francis.  ©  Matthew  B.  Hoy 
+
+Medical  Library,  Mayo  Clinic  Health  
+
+hoy.matt@mayo.edu 
+
+
