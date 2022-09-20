@@ -136,7 +136,7 @@ def resolve_dest(dest, doc):
     elif isinstance(dest, PSLiteral):
         dest = resolve1(doc.get_dest(dest.name))
     if isinstance(dest, dict):
-        dest = dest['D']    
+        dest = dest['D']
     return dest
 
 
@@ -179,30 +179,99 @@ def extract_outline_info(pages, outlines, doc, outfp, dest_info):
             outfp.write('<pageno>%r</pageno>\n' % pageno)
         outfp.write('</outline>\n')
 
+
 def get_dest_info(dest, outfp):
     if dest is not None:
         outfp.write('<dest>')
         dumpxml(outfp, dest)
         outfp.write('</dest>\n')
 
+
 """
 A helper to generate a page string given start and end pages
 A comma separated string of page numbers (required for pdf2txt)
 Adds an offset of 1 since pdfminer starts on page 0
 """
+
+
 def generate_page_string(start_page, end_page):
     st = ''
     for i in range(start_page+1, end_page+1):
         st += f'{i}, '
-    st += str(end_page+1)
+    if (start_page <= end_page):
+        st += str(end_page+1)
     return st
 
+
 """
-Writes the text belonging to a particular outline specified by the target_title,
-to a file called outname and reads the pdf from a file called fname. Optionally 
-takes in a password to open an encrypted pdf.
+Given the outlines, doc, pages and the title/outline we're
+looking for (target_title), return the page where we the
+outline is (start_page), and where the next outline starts (end_page)
+And the name of that outline (end_title)
 """
-def get_outlines_text(fname, target_title, outname, password = b''):
+
+
+def get_start_end_pages(outlines, target_title, doc, pages):
+    start_page = None
+    end_page = None
+    end_title = None
+    for (x, title, dest, a, y) in outlines:
+        # where to start reading
+        if (title == target_title):
+            start_page = get_page_number(dest, doc, pages, a)
+        # we've already found the outline to start reading from
+        elif start_page:
+            # the next one is where we stop reading
+            end_page = get_page_number(dest, doc, pages, a)
+            end_title = title
+            break
+
+    if not end_page:    # if the outline we want to extract is the last one
+        end_page = len(pages)
+
+    return start_page, end_page, end_title
+
+
+"""
+Writes the given pages (st), from the file fname to a temporary file
+Reads that file and writes only the text contained under our target_title
+to end_title to outfile
+"""
+
+
+def write_to_outfile(st, fname, outfile, end_title, target_title):
+    # write the text of the pdf document to a temporary file
+    pdf2txt.main(['pdf2txt.py', '-o',
+                  'tests/extracted.txt', '-p', st, fname])
+
+    # read that file to extract the text between the two outlines
+    with open('tests/extracted.txt', 'r', encoding='utf8') as fp:
+        lines = fp.readlines()
+        started_writing = False
+        with open(outfile, 'w+', encoding='utf8') as outfp:
+            for line in lines:
+                # maybe a bug with PDFMiner, sometimes adds extra space
+                line = line.replace("  ", " ")
+                if end_title == line.rstrip():
+                    break
+                if target_title == line.rstrip():
+                    started_writing = True
+                if started_writing:
+                    outfp.write(line)
+
+    # remove the temporary file, since we don't need it anymore
+    os.remove("tests/extracted.txt")
+
+
+"""
+Writes the text belonging to a particular outline specified by the
+target_title, to a file called outname and reads the pdf from a file
+called fname. Optionally takes in a password to open
+an encrypted pdf.
+"""
+
+
+def get_outlines_text(fname, target_title, outfile, password=b''):
     with open(fname, 'rb') as fp:
         parser = PDFParser(fp)
         doc = PDFDocument(parser, password)
@@ -211,46 +280,16 @@ def get_outlines_text(fname, target_title, outname, password = b''):
 
         try:
             outlines = doc.get_outlines()
-            start_page = None
-            end_page = None
-            end_title = None
-            for (x, title, dest, a, y) in outlines:
-                if (title == target_title):      # where to start reading
-                    start_page = get_page_number(dest, doc, pages, a)
-                elif start_page:                 # we've already found the outline to start reading from,
-                                                 # the next one is where we stop reading
-                    end_page = get_page_number(dest, doc, pages, a)
-                    end_title = title
-                    break
+            start_page, end_page, end_title = get_start_end_pages
+            (outlines, target_title, doc, pages)
 
-            if not start_page:  # couldn't find outline, return
+            # couldn't find the title, no text to get
+            if not start_page:
                 return
 
-            if not end_page:    # if the outline we want to extract is the last one
-                end_page = len(pages)
+            st = generate_page_string(start_page, end_page)
 
-            st = generate_page_string(start_page, end_page)  
-
-            # write the text of the pdf document to a temporary file
-            pdf2txt.main(['pdf2txt.py', '-o', 
-                  'tests/extracted.txt', '-p', st, fname])
-
-            # read that file to extract the text between the two outlines
-            with open('tests/extracted.txt', 'r', encoding='utf8') as fp:
-                lines = fp.readlines()
-                started_writing = False
-                with open(outname, 'w+', encoding='utf8') as outfp:
-                    for line in lines:  
-                        line = line.replace("  ", " ") 
-                        if end_title == line.rstrip():
-                            break
-                        if target_title == line.rstrip():
-                            started_writing = True          
-                        if started_writing:
-                            outfp.write(line)
-
-            # remove the temporary file, since we don't need it anymore
-            os.remove("tests/extracted.txt")
+            write_to_outfile(st, fname, outfile, end_title, target_title)
 
         except PDFNoOutlines:
             pass

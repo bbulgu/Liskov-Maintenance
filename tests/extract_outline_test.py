@@ -1,3 +1,7 @@
+import os
+from pdfminer.pdfdocument import PDFDocument, PDFNoOutlines
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFParser
 from tools import pdf2txt
 from tools import dumppdf
 
@@ -87,22 +91,108 @@ View publication stats
 
 """
 
-def test_extract_Introduction():
-    dumppdf.get_outlines("samples/sci.pdf", "Introduction", 'results/introduction.txt', password = b'')
+fname = "samples/sci.pdf"
+
+# testing the helper functions
+
+
+def test_generate_page_string():
+    assert (dumppdf.generate_page_string(1, 3) == "2, 3, 4")
+    assert (dumppdf.generate_page_string(4, 3) == "")
+
+
+def test_get_start_end_pages_correct():
+    with open(fname, 'rb') as fp:
+        parser = PDFParser(fp)
+        doc = PDFDocument(parser, b'')
+        pages = dict((page.pageid, pageno) for (pageno, page)
+                     in enumerate(PDFPage.create_pages(doc)))
+
+        try:
+            outlines = doc.get_outlines()
+            start_page, end_page, end_title = dumppdf.get_start_end_pages(
+                outlines, "Introduction", doc, pages)
+            assert (start_page == 1)
+            assert (end_page == 1)
+            assert (end_title == "What is SCI-HUB?")
+        except PDFNoOutlines:
+            pass
+        parser.close()
+
+
+def test_get_start_end_pages_fails():
+    with open(fname, 'rb') as fp:
+        parser = PDFParser(fp)
+        doc = PDFDocument(parser, b'')
+        pages = dict((page.pageid, pageno) for (pageno, page)
+                     in enumerate(PDFPage.create_pages(doc)))
+
+        try:
+            outlines = doc.get_outlines()
+            start_page, end_page, end_title = dumppdf.get_start_end_pages(
+                outlines, "", doc, pages)
+            assert (start_page is None)
+            assert (end_page == 7)      # this pdf has 7 pages
+            assert (end_title is None)
+        except PDFNoOutlines:
+            pass
+        parser.close()
+
+
+def test_get_start_end_pages_different():
+    with open(fname, 'rb') as fp:
+        parser = PDFParser(fp)
+        doc = PDFDocument(parser, b'')
+        pages = dict((page.pageid, pageno) for (pageno, page)
+                     in enumerate(PDFPage.create_pages(doc)))
+
+        try:
+            outlines = doc.get_outlines()
+            start_page, end_page, end_title = dumppdf.get_start_end_pages(
+                outlines, "What is SCI-HUB?", doc, pages)
+            assert (start_page == 1)
+            assert (end_page == 3)      # this pdf has 7 pages
+            assert (end_title == "Legal and Ethical Issues")
+        except PDFNoOutlines:
+            pass
+        parser.close()
+
+
+def test_write_to_outfile():
+    dumppdf.write_to_outfile(
+        '2', fname, "results/introduction.txt",
+        "What is SCI-HUB?", "Introduction")
     with open('results/introduction.txt', 'r', encoding='utf8') as fp:
         lines = fp.readlines()
+    os.remove("results/introduction.txt")
     assert ("".join(lines) == introduction)
 
+# Testing the full implementation
+
+
+def test_extract_Introduction():
+    dumppdf.get_outlines_text(fname, "Introduction",
+                              'results/introduction.txt', password=b'')
+    with open('results/introduction.txt', 'r', encoding='utf8') as fp:
+        lines = fp.readlines()
+    os.remove("results/introduction.txt")
+    assert ("".join(lines) == introduction)
+
+
 def test_extract_References():
-    dumppdf.get_outlines("samples/sci.pdf", "References", 'results/references.txt', password = b'')
+    dumppdf.get_outlines_text(
+        fname, "References", 'results/references.txt', password=b'')
     with open('results/references.txt', 'r', encoding='utf8') as fp:
         lines = fp.readlines()
+    os.remove("results/references.txt")
     assert ("".join(lines) == references)
 
+
 def test_extract_wrong_outline():
-    dumppdf.get_outlines("samples/sci.pdf", "What is SCI-HUBB?", 'results/whatis.txt', password = b'')
+    dumppdf.get_outlines_text("samples/sci.pdf", "What is SCI-HUBB?",
+                              "results/whatis.txt")
     try:
-        with open('results/whatis.txt', 'r', encoding='utf8') as fp:
+        with open('results/whatis.txt', 'r', encoding='utf8'):
             assert False
-    except:
+    except FileNotFoundError:
         assert True
