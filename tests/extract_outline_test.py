@@ -130,7 +130,7 @@ def test_get_start_end_pages_fails():
         try:
             outlines = doc.get_outlines()
             start_page, end_page, end_title = dumppdf.get_start_end_pages(
-                outlines, "", doc, pages)
+                                                 outlines, "", doc, pages)
             assert (start_page is None)
             assert (end_page == 7)      # this pdf has 7 pages
             assert (end_title is None)

@@ -280,8 +280,8 @@ def get_outlines_text(fname, target_title, outfile, password=b''):
 
         try:
             outlines = doc.get_outlines()
-            start_page, end_page, end_title = get_start_end_pages
-            (outlines, target_title, doc, pages)
+            start_page, end_page, end_title = get_start_end_pages(
+                outlines, target_title, doc, pages)
 
             # couldn't find the title, no text to get
             if not start_page:
