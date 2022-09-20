@@ -9,7 +9,6 @@ from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
 from pdfminer.cmapdb import CMapDB
 from pdfminer.layout import LAParams
 from pdfminer.image import ImageWriter
-from tools.dumppdf import dumpoutline
 
 """
 Prints how the tool should be used.
@@ -29,6 +28,8 @@ def usage():
 Extracts the commandline arguments and declares them to independant variables
 and calls pdfconversion with the corresponding arguments
 """
+
+
 def commandline(argv):
     import getopt
 
