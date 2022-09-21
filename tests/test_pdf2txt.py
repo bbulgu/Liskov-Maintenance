@@ -6,10 +6,6 @@ Tests the commandline part of pdf2txt.py
 """
 
 
-def usage():
-    return 100
-
-
 def test_cmd():
     assert commandline(['pdf2txt.py', '-P', 'test', './sample.pdf']) == 0
 

@@ -484,6 +484,10 @@ class XMLConverter(PDFConverter):
 
     CONTROL = re.compile(r'[\x00-\x08\x0b-\x0c\x0e-\x1f]')
 
+    # coordinates_type char
+    # can be 'c' for character, 'w' for word or 'l' for line
+    # This parameter is used to choose if the coordinates should be extracted
+    # for each character, word or line.
     def __init__(self, rsrcmgr, outfp, pageno=1,
                  laparams=None, imagewriter=None, stripcontrol=False,
                  coordinates_type='c'):
