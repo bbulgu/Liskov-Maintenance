@@ -80,10 +80,10 @@ class BMPWriter:
         self.fp.write(data)
         return
 
+
 # PngWriter
 ##
 class PngWriter:
-
     """
     A class to save images with png extensions
 
