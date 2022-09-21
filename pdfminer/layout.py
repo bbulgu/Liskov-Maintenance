@@ -205,7 +205,6 @@ class LTImage(LTComponent):
         self.colorspace = stream.get_any(('CS', 'ColorSpace'))
         if not isinstance(self.colorspace, list):
             self.colorspace = [self.colorspace]
-        print(name)
         return
 
     def __repr__(self):

@@ -80,14 +80,35 @@ class BMPWriter:
         self.fp.write(data)
         return
 
-
+# PngWriter
+## 
 class PngWriter:
+    """
+    A class to save images with png extensions
+
+    Attributes
+    ----------
+    fp : str
+        filepath to location to store image
+    width: int
+        width of image in pixels
+    height: int
+        height of image in pixels
+    color: str
+        RGB for colorized images
+        L for greyscale
+        1 for black and white
+    """
     def __init__(self, fp, width, height, color):
         self.fp = fp
         self.color = color
         self.image = Image.new(color, (width, height))
 
     def write(self, data):
+        """
+        Writes bitmap data to permanent storage
+        to the its fp. 
+        """
         if self.color == 'RGB':
             r = data[0::3]
             g = data[1::3]
@@ -119,9 +140,7 @@ class ImageWriter:
     def export_image(self, image):
         stream = image.stream
         filters = stream.get_filters()
-        print(type(stream))
         (width, height) = image.srcsize
-        print(image)
         if len(filters) == 1 and filters[0][0] in LITERALS_DCT_DECODE:
             ext = '.jpg'
         elif (image.bits == 1 or

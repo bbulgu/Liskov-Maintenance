@@ -1,1 +1,2 @@
+# Package used to handle image processing
 Pillow
