@@ -27,6 +27,9 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# vscode debug settings
+.vscode
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -209,3 +212,7 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # End of JetBrains .gitignore
+
+tests/output-pictures/
+tests/test_jpg
+tests/test_png

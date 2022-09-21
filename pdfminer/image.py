@@ -3,6 +3,10 @@ import struct
 import os
 import os.path
 from io import BytesIO
+
+from PIL import Image
+from PIL import ImageChops
+
 from .pdftypes import LITERALS_DCT_DECODE
 from .pdfcolor import LITERAL_DEVICE_GRAY
 from .pdfcolor import LITERAL_DEVICE_RGB
@@ -77,15 +81,62 @@ class BMPWriter:
         return
 
 
+# PngWriter
+##
+class PngWriter:
+    """
+    A class to save images with png extensions
+
+    Attributes
+    ----------
+    fp : str
+        filepath to location to store image
+    width: int
+        width of image in pixels
+    height: int
+        height of image in pixels
+    color: str
+        RGB for colorized images
+        L for greyscale
+        1 for black and white
+    """
+    def __init__(self, fp, width, height, color):
+        self.fp = fp
+        self.color = color
+        self.image = Image.new(color, (width, height))
+
+    def write(self, data):
+        """
+        Writes bitmap data to permanent storage
+        to the its fp.
+        """
+        if self.color == 'RGB':
+            r = data[0::3]
+            g = data[1::3]
+            b = data[2::3]
+
+            self.image.putdata(list(zip(r, g, b)))
+        elif self.color == '1':
+            self.image.putdata(data)
+        elif self.color == 'L':
+            self.image.putdata(data)
+
+        self.image.save(fp=self.fp)
+
+
 # ImageWriter
 ##
 class ImageWriter:
 
-    def __init__(self, outdir):
+    def __init__(self, outdir, png=False):
         self.outdir = outdir
+        self.png = png
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
         return
+
+    def set_png(self, png):
+        self.png = png
 
     def export_image(self, image):
         stream = image.stream
@@ -97,6 +148,8 @@ class ImageWriter:
               image.bits == 8 and image.colorspace in (LITERAL_DEVICE_RGB,
                                                        LITERAL_DEVICE_GRAY)):
             ext = '.%dx%d.bmp' % (width, height)
+        elif self.png:
+            ext = '.%d.%dx%d.png' % (image.bits, width, height)
         else:
             ext = '.%d.%dx%d.img' % (image.bits, width, height)
         name = image.name + ext
@@ -105,8 +158,6 @@ class ImageWriter:
             if ext == '.jpg':
                 raw_data = stream.get_rawdata()
                 if LITERAL_DEVICE_CMYK in image.colorspace:
-                    from PIL import Image
-                    from PIL import ImageChops
                     ifp = BytesIO(raw_data)
                     i = Image.open(ifp)
                     i = ImageChops.invert(i)
@@ -114,29 +165,45 @@ class ImageWriter:
                     i.save(fp, 'JPEG')
                 else:
                     fp.write(raw_data)
+
             elif image.bits == 1:
-                bmp = BMPWriter(fp, 1, width, height)
                 data = stream.get_data()
-                i = 0
-                width = (width + 7) // 8
-                for y in range(height):
-                    bmp.write_line(y, data[i:i + width])
-                    i += width
-            elif image.bits == 8 and image.colorspace is LITERAL_DEVICE_RGB:
-                bmp = BMPWriter(fp, 24, width, height)
+                if self.png:
+                    png = PngWriter(fp, width, height, '1')
+                    png.write(data)
+                else:
+                    bmp = BMPWriter(fp, 1, width, height)
+                    i = 0
+                    width = (width + 7) // 8
+                    for y in range(height):
+                        bmp.write_line(y, data[i:i + width])
+                        i += width
+
+            elif image.bits == 8 and LITERAL_DEVICE_RGB in image.colorspace:
                 data = stream.get_data()
-                i = 0
-                width = width * 3
-                for y in range(height):
-                    bmp.write_line(y, data[i:i + width])
-                    i += width
-            elif image.bits == 8 and image.colorspace is LITERAL_DEVICE_GRAY:
-                bmp = BMPWriter(fp, 8, width, height)
+                if self.png:
+                    png = PngWriter(fp, width, height, 'RGB')
+                    png.write(data)
+                else:
+                    bmp = BMPWriter(fp, 24, width, height)
+
+                    i = 0
+                    width = width * 3
+                    for y in range(height):
+                        bmp.write_line(y, data[i:i + width])
+                        i += width
+
+            elif image.bits == 8 and LITERAL_DEVICE_GRAY in image.colorspace:
                 data = stream.get_data()
-                i = 0
-                for y in range(height):
-                    bmp.write_line(y, data[i:i + width])
-                    i += width
+                if self.png:
+                    png = PngWriter(fp, width, height, 'L')
+                    png.write(data)
+                else:
+                    bmp = BMPWriter(fp, 8, width, height)
+                    i = 0
+                    for y in range(height):
+                        bmp.write_line(y, data[i:i + width])
+                        i += width
             else:
-                fp.write(stream.get_data())
+                fp.write(stream.get_rawdata())
         return name
