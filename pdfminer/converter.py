@@ -533,6 +533,63 @@ class XMLConverter(PDFConverter):
                 self.outfp.write('</textgroup>\n')
             return
 
+        def coordinates_word(item):
+            # Extracts the coordinates for each word in a line.
+            coord = [0, 0, 0, 0]
+            is_first = True
+            size = 0
+            font = ""
+            txt = ""
+            for child in item:
+                # Checks each character if it is a new-line or space character
+                # it counts as the end of a word. If so, print out the word
+                # with its coordinates. The first character of a line and the
+                # first character after an end of word char are counted as
+                # first character of word. This characters left coordinates are
+                # saved into the coord list which keeps track of the 
+                # coordinates. The characters font and size is also saved.
+                # During each loop, the right coordinates are saved as well as 
+                # the character is appended to the string.
+                if child._text == ' ' or child._text == '\n':
+                    self.outfp.write(
+                            '<text font="%s" bbox="%s" size="%.3f">' % (
+                             q(font), bbox2str(tuple(coord)), size))
+                    self.write_text(txt)
+                    self.outfp.write('</text>\n')
+                    txt = ""
+                    is_first = True
+                    render(child)
+                    continue
+
+                if is_first:
+                    coord[0] = child.bbox[0]
+                    coord[1] = child.bbox[1]
+                    size = child.size
+                    font = child.fontname
+                    is_first = False
+
+                txt = txt + child._text
+                coord[2] = child.bbox[2]
+                coord[3] = child.bbox[3]
+
+        def coordinates_line(item):
+            # Checks the first character of the line for the fontsize and
+            # fontname. It uses a for-loop since the item is not subscriptable.
+            # Then it outputs the coordinates of the line.
+            coord = item.bbox
+            txt = item.get_text()[:-1]
+            size = -1
+            font = ""
+            for child in item:
+                size = child.size
+                font = child.fontname
+                break
+            self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' %
+                             (q(font), bbox2str(coord), size))
+            self.write_text(txt)
+            self.outfp.write('</text>\n')
+            return
+
         def render(item):
             if isinstance(item, LTPage):
                 self.outfp.write(
@@ -573,47 +630,11 @@ class XMLConverter(PDFConverter):
                     for child in item:
                         render(child)
                 elif self.coordinates_type == 'w':  # Output for every word
-                    coord = [0, 0, 0, 0]
-                    is_first = True
-                    size = 0
-                    font = ""
-                    txt = ""
-                    for child in item:
-                        if child._text == ' ' or child._text == '\n':
-                            self.outfp.write(
-                                '<text font="%s" bbox="%s" size="%.3f">' % (
-                                    q(font), bbox2str(tuple(coord)), size))
-                            self.write_text(txt)
-                            self.outfp.write('</text>\n')
-                            txt = ""
-                            is_first = True
-                            render(child)
-                            continue
-
-                        if is_first:
-                            coord[0] = child.bbox[0]
-                            coord[1] = child.bbox[1]
-                            size = child.size
-                            font = child.fontname
-                            is_first = False
-
-                        txt = txt + child._text
-                        coord[2] = child.bbox[2]
-                        coord[3] = child.bbox[3]
+                    coordinates_word(item)
 
                 elif self.coordinates_type == 'l':  # Output for every line
-                    coord = item.bbox
-                    txt = item.get_text()[:-1]
-                    size = -1
-                    font = ""
-                    for child in item:
-                        size = child.size
-                        font = child.fontname
-                        break
-                    self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' %
-                                     (q(font), bbox2str(coord), size))
-                    self.write_text(txt)
-                    self.outfp.write('</text>\n')
+                    coordinates_line(item)
+                    #
 
                 self.outfp.write('</textline>\n')
             elif isinstance(item, LTTextBox):
