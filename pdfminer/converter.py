@@ -546,9 +546,9 @@ class XMLConverter(PDFConverter):
                 # with its coordinates. The first character of a line and the
                 # first character after an end of word char are counted as
                 # first character of word. This characters left coordinates are
-                # saved into the coord list which keeps track of the 
+                # saved into the coord list which keeps track of the
                 # coordinates. The characters font and size is also saved.
-                # During each loop, the right coordinates are saved as well as 
+                # During each loop, the right coordinates are saved as well as
                 # the character is appended to the string.
                 if child._text == ' ' or child._text == '\n':
                     self.outfp.write(
