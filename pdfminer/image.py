@@ -81,8 +81,9 @@ class BMPWriter:
         return
 
 # PngWriter
-## 
+##
 class PngWriter:
+
     """
     A class to save images with png extensions
 
@@ -107,7 +108,7 @@ class PngWriter:
     def write(self, data):
         """
         Writes bitmap data to permanent storage
-        to the its fp. 
+        to the its fp.
         """
         if self.color == 'RGB':
             r = data[0::3]
