@@ -140,6 +140,16 @@ def resolve_dest(dest, doc):
     return dest
 
 
+"""
+Returns the page number for an outline,
+given its destination (dest)
+The required parameters of the function
+(dest, a) are all part of the outline
+doc contains the document as a whole
+pages have all the information about the pages
+"""
+
+
 def get_page_number(dest, doc, pages, a):
     pageno = None
     if dest:
@@ -156,20 +166,20 @@ def get_page_number(dest, doc, pages, a):
     return pageno
 
 
+"""
+Goes through all the outlines and extracts the
+information, writing it to outfp (outputfile pointer).
+doc contains the document as a whole
+pages have all the information about the pages
+dest_info is a boolean flag designating whether we
+want to write the destination information to the file or not
+outlines contain the outline information
+"""
+
+
 def extract_outline_info(pages, outlines, doc, outfp, dest_info):
     for (level, title, dest, a, se) in outlines:
-        pageno = None
-        if dest:
-            dest = resolve_dest(dest, doc)
-            pageno = pages[dest[0].objid]
-        elif a:
-            action = a.resolve()
-            if isinstance(action, dict):
-                subtype = action.get('S')
-                if subtype and repr(
-                        subtype) == '/GoTo' and action.get('D'):
-                    dest = resolve_dest(action['D'], doc)
-                    pageno = pages[dest[0].objid]
+        pageno = get_page_number(dest, doc, pages, a)
         s = q(title)
         outfp.write('<outline level="%r" title="%s">\n' %
                     (level, q(s)))
@@ -178,6 +188,13 @@ def extract_outline_info(pages, outlines, doc, outfp, dest_info):
         if pageno is not None:
             outfp.write('<pageno>%r</pageno>\n' % pageno)
         outfp.write('</outline>\n')
+
+
+"""
+Writes the destination to file if it is not None
+dest: destination
+outfp: outputfile pointer
+"""
 
 
 def get_dest_info(dest, outfp):
