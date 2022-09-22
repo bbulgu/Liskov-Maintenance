@@ -86,10 +86,9 @@ def test_write_to_outfile():
     os.remove("tests/introduction.txt")
     assert (lines == read_lines(INTRODUCTION))
 
+
 # Testing the full implementation
-
-
-def test_extract_Introduction():
+def test_extract_introduction():
     dumppdf.get_outlines_text(FNAME, "Introduction",
                               'tests/introduction.txt', password=b'')
     lines = read_lines('tests/introduction.txt')
@@ -97,7 +96,7 @@ def test_extract_Introduction():
     assert (lines == read_lines(INTRODUCTION))
 
 
-def test_extract_References():
+def test_extract_references():
     dumppdf.get_outlines_text(
         FNAME, "References", 'tests/references.txt', password=b'')
     lines = read_lines('tests/references.txt')
