@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages>
+<page id="1" bbox="0.000,0.000,612.000,792.000" rotate="0">
+<textbox id="0" bbox="133.410,637.370,278.884,669.419">
+<textline bbox="133.410,655.302,190.555,669.419">
+<text font="HWPECH+LMRoman10-Regular" bbox="133.410,655.302,152.837,669.419" size="14.117">This</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="156.145,655.302,162.840,669.419" size="14.117">is</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="166.157,655.302,171.138,669.419" size="14.117">a</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="174.456,655.302,190.555,669.419" size="14.117">test</text>
+<text>
+</text>
+</textline>
+<textline bbox="133.410,637.370,278.884,651.487">
+<text font="HWPECH+LMRoman10-Regular" bbox="133.410,637.370,152.837,651.487" size="14.117">This</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="156.145,637.370,162.840,651.487" size="14.117">is</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="166.157,637.370,179.995,651.487" size="14.117">the</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="183.313,637.370,212.144,651.487" size="14.117">second</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="215.462,637.370,230.964,651.487" size="14.117">line</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="234.281,637.370,242.311,651.487" size="14.117">of</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="245.629,637.370,259.467,651.487" size="14.117">the</text>
+<text> </text>
+<text font="HWPECH+LMRoman10-Regular" bbox="262.784,637.370,278.884,651.487" size="14.117">test</text>
+<text>
+</text>
+</textline>
+</textbox>
+<textbox id="1" bbox="303.133,87.432,308.114,101.549">
+<textline bbox="303.133,87.432,308.114,101.549">
+<text font="HWPECH+LMRoman10-Regular" bbox="303.133,87.432,308.114,101.549" size="14.117">1</text>
+<text>
+</text>
+</textline>
+</textbox>
+<layout>
+<textgroup bbox="133.410,87.432,308.114,669.419">
+<textbox id="0" bbox="133.410,637.370,278.884,669.419" />
+<textbox id="1" bbox="303.133,87.432,308.114,101.549" />
+</textgroup>
+</layout>
+</page>
+</pages>
