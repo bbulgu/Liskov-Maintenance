@@ -4,7 +4,7 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
 from tools import dumppdf
 
-
+# the names of the files used for testing and verification of tests
 FNAME = "samples/sci.pdf"
 INTRODUCTION = "tests/expected_introduction.txt"
 REFERENCES = "tests/expected_references.txt"
@@ -80,10 +80,10 @@ def test_get_start_end_pages_different():
 
 def test_write_to_outfile():
     dumppdf.write_to_outfile(
-        '2', FNAME, "results/introduction.txt",
+        '2', FNAME, "tests/introduction.txt",
         "What is SCI-HUB?", "Introduction")
-    lines = read_lines('results/introduction.txt')
-    os.remove("results/introduction.txt")
+    lines = read_lines('tests/introduction.txt')
+    os.remove("tests/introduction.txt")
     assert (lines == read_lines(INTRODUCTION))
 
 # Testing the full implementation
@@ -91,25 +91,25 @@ def test_write_to_outfile():
 
 def test_extract_Introduction():
     dumppdf.get_outlines_text(FNAME, "Introduction",
-                              'results/introduction.txt', password=b'')
-    lines = read_lines('results/introduction.txt')
-    os.remove("results/introduction.txt")
+                              'tests/introduction.txt', password=b'')
+    lines = read_lines('tests/introduction.txt')
+    os.remove("tests/introduction.txt")
     assert (lines == read_lines(INTRODUCTION))
 
 
 def test_extract_References():
     dumppdf.get_outlines_text(
-        FNAME, "References", 'results/references.txt', password=b'')
-    lines = read_lines('results/references.txt')
-    os.remove("results/references.txt")
+        FNAME, "References", 'tests/references.txt', password=b'')
+    lines = read_lines('tests/references.txt')
+    os.remove("tests/references.txt")
     assert (lines == read_lines(REFERENCES))
 
 
 def test_extract_wrong_outline():
     dumppdf.get_outlines_text("samples/sci.pdf", "What is SCI-HUBB?",
-                              "results/whatis.txt")
+                              "tests/whatis.txt")
     try:
-        with open('results/whatis.txt', 'r', encoding='utf8'):
+        with open('tests/whatis.txt', 'r', encoding='utf8'):
             assert False
     except FileNotFoundError:
         assert True
