@@ -6,15 +6,14 @@ For coding convention we are going too use <a href="https://peps.python.org/pep-
 ## Code review guidelines
 1. Descriptive function names.
 2. Big chunks of code should be refactored if possible.
-3. An active pull request should be handled within 3 working days.
-4. Make sure the code is well documented where needed.
+3. Make sure the code is well documented where needed.
 
 ## Testing framework
 We chose pytest as our framework for no specific reason.
 
-## Pull request and code review deadline deadline
+## Pull request and code review deadline
 For the pull request it should be done no later than two (2) days before the sprint deadline.
-For the code review it should be done at maximum one (1) working day after the pull request has been submitted.
+For the code review it should be done at maximum two (2) working days after the pull request has been submitted or one (1) day before the sprint deadline.
 
 Below follows the readme file of the original repository
 
