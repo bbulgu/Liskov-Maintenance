@@ -161,9 +161,19 @@ class PSBaseParser:
 
     debug = 0
 
+
     def __init__(self, fp):
         self.fp = fp
         self.seek(0)
+        self.token_dict = {
+            b'%': (b'%', self._parse_comment),
+            b'/': (b'', self._parse_literal),
+            b'.': (b'.', self._parse_float),
+            b'(': (b'', self._parse_string),
+            b'<': (b'', self._parse_wopen),
+            b'>': (b'', self._parse_wclose)
+        }
+
         return
 
     def __repr__(self):
@@ -271,6 +281,42 @@ class PSBaseParser:
                 s = s[:n]
                 buf = b''
         return
+
+    # def _parse_main(self, s, i):
+    #     m = NONSPC.search(s, i)
+    #
+    #     if not m:
+    #         return len(s)
+    #
+    #     j = m.start(0)
+    #     c = s[j:j + 1]
+    #
+    #     self._curtokenpos = self.bufpos + j
+    #
+    #     # self.token_dict = {
+    #     #     b'%': (b'%', self._parse_comment),
+    #     #     b'/': (b'', self._parse_comment),
+    #     #     b'.': (b'.', self._parse_float),
+    #     #     b'(': (b'', self._parse_string),
+    #     #     b'<': (b'', self._parse_wopen),
+    #     #     b'>': (b'', self._parse_wclose)
+    #     # }
+    #
+    #     if c in self.token_dict:
+    #         self._curtoken, self._parse1 = self.token_dict[c]
+    #
+    #         if c == b'(':
+    #             self.paren = 1
+    #     elif c in b'-+' or c.isdigit():
+    #         self._curtoken = c
+    #         self._parse1 = self._parse_number
+    #     elif c.isalpha():
+    #         self._curtoken = c
+    #         self._parse1 = self._parse_keyword
+    #     else:
+    #         self._add_token(KWD(c))
+    #
+    #     return j + 1
 
     def _parse_main(self, s, i):
         m = NONSPC.search(s, i)
