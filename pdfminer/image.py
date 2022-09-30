@@ -12,6 +12,9 @@ from .pdfcolor import LITERAL_DEVICE_GRAY
 from .pdfcolor import LITERAL_DEVICE_RGB
 from .pdfcolor import LITERAL_DEVICE_CMYK
 
+from memory_profiler import profile
+
+
 
 def align32(x):
     return ((x + 3) // 4) * 4
@@ -103,25 +106,32 @@ class PngWriter:
     def __init__(self, fp, width, height, color):
         self.fp = fp
         self.color = color
-        self.image = Image.new(color, (width, height))
+        self.width = width
+        self.height = height
 
-    def write(self, data):
+    def write(self, data, fp=None):
         """
         Writes bitmap data to permanent storage
         to the its fp.
+        If optional fp i given, also sets new path where to store image
         """
+        if fp:
+            self.fp = fp
+
+        image = Image.new(self.color, (self.width, self.height))
+
         if self.color == 'RGB':
             r = data[0::3]
             g = data[1::3]
             b = data[2::3]
 
-            self.image.putdata(list(zip(r, g, b)))
+            image.putdata(list(zip(r, g, b)))
         elif self.color == '1':
-            self.image.putdata(data)
+            image.putdata(data)
         elif self.color == 'L':
-            self.image.putdata(data)
+            image.putdata(data)
 
-        self.image.save(fp=self.fp)
+        image.save(fp=self.fp)
 
 
 # ImageWriter
@@ -138,6 +148,7 @@ class ImageWriter:
     def set_png(self, png):
         self.png = png
 
+    
     def export_image(self, image):
         stream = image.stream
         filters = stream.get_filters()

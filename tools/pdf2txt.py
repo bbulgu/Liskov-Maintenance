@@ -134,7 +134,6 @@ def commandline(argv):
 Converts pdf to specified output format and filetype.
 """
 
-
 def pdfconversion(
         args,
         password,
