@@ -1,8 +1,6 @@
 import os
-import profile
 
 from tools.pdf2txt import commandline
-from memory_profiler import profile
 
 PNG = 'samples/PNG.pdf'
 JPG = 'samples/JPG.pdf'
@@ -20,11 +18,13 @@ def assert_file(extension):
 
     assert found_file
 
+
 def test_jpg():
     assert commandline(
         ['pdf2text.py', '-o', 'tests/test_jpg', '-t', 'text', '-O', DIR,
          JPG]) == 0
     assert_file('.jpg')
+
 
 def test_png():
     """Tests Imagewriters with respect to PNG"""
@@ -35,7 +35,8 @@ def test_png():
 
 
 def test_bmp():
-    """Tests Imagewriters with respect to BMP to increase coverage of image.py"""
+    """Tests Imagewriters with respect
+    to BMP to increase coverage of image.py"""
     assert commandline(
-        ['pdf2text.py', '-o', 'tests/test_png', '-t', 'text', '-O', 'tests/output-test-coverage',
-         PNG]) == 0
+        ['pdf2text.py', '-o', 'tests/test_png', '-t', 'text',
+         '-O', 'tests/output-test-coverage', PNG]) == 0

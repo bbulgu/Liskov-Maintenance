@@ -130,10 +130,6 @@ def commandline(argv):
         debug)
 
 
-"""
-Converts pdf to specified output format and filetype.
-"""
-
 def pdfconversion(
         args,
         password,
@@ -150,6 +146,9 @@ def pdfconversion(
         caching,
         laparams,
         debug):
+    """
+    Converts pdf to specified output format and filetype.
+    """
     rsrcmgr = PDFResourceManager(caching=caching)
     if not outtype:
         outtype = 'text'

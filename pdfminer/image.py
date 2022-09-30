@@ -12,9 +12,6 @@ from .pdfcolor import LITERAL_DEVICE_GRAY
 from .pdfcolor import LITERAL_DEVICE_RGB
 from .pdfcolor import LITERAL_DEVICE_CMYK
 
-from memory_profiler import profile
-
-
 
 def align32(x):
     return ((x + 3) // 4) * 4
@@ -148,7 +145,6 @@ class ImageWriter:
     def set_png(self, png):
         self.png = png
 
-    
     def export_image(self, image):
         stream = image.stream
         filters = stream.get_filters()
