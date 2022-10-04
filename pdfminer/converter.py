@@ -481,7 +481,9 @@ class HTMLConverter(PDFConverter):
 # XMLConverter
 ##
 class XMLConverter(PDFConverter):
-
+    # Strings are added here as render() runs,
+    # and they get written from render_result at close()
+    render_temp = []
     CONTROL = re.compile(r'[\x00-\x08\x0b-\x0c\x0e-\x1f]')
 
     # coordinates_type char
@@ -501,11 +503,12 @@ class XMLConverter(PDFConverter):
         self.stripcontrol = stripcontrol
         self.write_header()
         self.coordinates_type = coordinates_type
+        self.render_result = ""
         return
 
     def write_header(self):
-        self.outfp.write('<?xml version="1.0" encoding="utf-8" ?>\n')
-        self.outfp.write('<pages>\n')
+        self.render_temp.append('<?xml version="1.0" encoding="utf-8" ?>\n')
+        self.render_temp.append('<pages>\n')
         return
 
     def write_footer(self):
@@ -515,22 +518,22 @@ class XMLConverter(PDFConverter):
     def write_text(self, text):
         if self.stripcontrol:
             text = self.CONTROL.sub(u'', text)
-        self.outfp.write(q(text))
+        self.render_temp.append(q(text))
         return
 
     def receive_layout(self, ltpage):
         def show_group(item):
             if isinstance(item, LTTextBox):
-                self.outfp.write('<textbox id="%d" bbox="%s" />\n' %
-                                 (item.index, bbox2str(item.bbox)))
+                self.render_temp.append('<textbox id="%d" bbox="%s" />\n' %
+                                        (item.index, bbox2str(item.bbox)))
             elif isinstance(item, LTTextGroup):
-                self.outfp.write(
+                self.render_temp.append(
                     '<textgroup bbox="%s">\n' %
                     bbox2str(
                         item.bbox))
                 for child in item:
                     show_group(child)
-                self.outfp.write('</textgroup>\n')
+                self.render_temp.append('</textgroup>\n')
             return
 
         def coordinates_word(item):
@@ -551,11 +554,11 @@ class XMLConverter(PDFConverter):
                 # During each loop, the right coordinates are saved as well as
                 # the character is appended to the string.
                 if child._text == ' ' or child._text == '\n':
-                    self.outfp.write(
+                    self.render_temp.append(
                             '<text font="%s" bbox="%s" size="%.3f">' % (
                              q(font), bbox2str(tuple(coord)), size))
                     self.write_text(txt)
-                    self.outfp.write('</text>\n')
+                    self.render_temp.append('</text>\n')
                     txt = ""
                     is_first = True
                     render(child)
@@ -584,45 +587,45 @@ class XMLConverter(PDFConverter):
                 size = child.size
                 font = child.fontname
                 break
-            self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' %
-                             (q(font), bbox2str(coord), size))
+            self.render_temp.append('<text font="%s" bbox="%s" size="%.3f">' %
+                                    (q(font), bbox2str(coord), size))
             self.write_text(txt)
-            self.outfp.write('</text>\n')
+            self.render_temp.append('</text>\n')
             return
 
         def render(item):
             if isinstance(item, LTPage):
-                self.outfp.write(
+                self.render_temp.append(
                     '<page id="%s" bbox="%s" rotate="%d">\n' %
                     (item.pageid, bbox2str(
                         item.bbox), item.rotate))
                 for child in item:
                     render(child)
                 if item.groups is not None:
-                    self.outfp.write('<layout>\n')
+                    self.render_temp.append('<layout>\n')
                     for group in item.groups:
                         show_group(group)
-                    self.outfp.write('</layout>\n')
-                self.outfp.write('</page>\n')
+                    self.render_temp.append('</layout>\n')
+                self.render_temp.append('</page>\n')
             elif isinstance(item, LTLine):
-                self.outfp.write('<line linewidth="%d" bbox="%s" />\n' %
-                                 (item.linewidth, bbox2str(item.bbox)))
+                self.render_temp.append('<line linewidth="%d" bbox="%s" />\n' %
+                                        (item.linewidth, bbox2str(item.bbox)))
             elif isinstance(item, LTRect):
-                self.outfp.write('<rect linewidth="%d" bbox="%s" />\n' %
-                                 (item.linewidth, bbox2str(item.bbox)))
+                self.render_temp.append('<rect linewidth="%d" bbox="%s" />\n' %
+                                        (item.linewidth, bbox2str(item.bbox)))
             elif isinstance(item, LTCurve):
-                self.outfp.write(
+                self.render_temp.append(
                     '<curve linewidth="%d" bbox="%s" pts="%s"/>\n' %
                     (item.linewidth, bbox2str(
                         item.bbox), item.get_pts()))
             elif isinstance(item, LTFigure):
-                self.outfp.write('<figure name="%s" bbox="%s">\n' %
-                                 (item.name, bbox2str(item.bbox)))
+                self.render_temp.append('<figure name="%s" bbox="%s">\n' %
+                                        (item.name, bbox2str(item.bbox)))
                 for child in item:
                     render(child)
-                self.outfp.write('</figure>\n')
+                self.render_temp.append('</figure>\n')
             elif isinstance(item, LTTextLine):
-                self.outfp.write(
+                self.render_temp.append(
                     '<textline bbox="%s">\n' %
                     bbox2str(
                         item.bbox))
@@ -634,40 +637,47 @@ class XMLConverter(PDFConverter):
 
                 elif self.coordinates_type == 'l':  # Output for every line
                     coordinates_line(item)
-                    #
 
-                self.outfp.write('</textline>\n')
+                self.render_temp.append('</textline>\n')
             elif isinstance(item, LTTextBox):
                 wmode = ''
                 if isinstance(item, LTTextBoxVertical):
                     wmode = ' wmode="vertical"'
-                self.outfp.write('<textbox id="%d" bbox="%s"%s>\n' %
-                                 (item.index, bbox2str(item.bbox), wmode))
+                self.render_temp.append('<textbox id="%d" bbox="%s"%s>\n' %
+                                        (item.index, bbox2str(item.bbox),
+                                         wmode))
                 for child in item:
                     render(child)
-                self.outfp.write('</textbox>\n')
+                self.render_temp.append('</textbox>\n')
             elif isinstance(item, LTChar):
-                self.outfp.write('<text font="%s" bbox="%s" size="%.3f">' % (
-                    q(item.fontname), bbox2str(item.bbox), item.size))
+                self.render_temp.append(
+                                    '<text font="%s" bbox="%s" size="%.3f">' %
+                                    (q(item.fontname),
+                                        bbox2str(item.bbox), item.size))
                 self.write_text(item.get_text())
-                self.outfp.write('</text>\n')
+                self.render_temp.append('</text>\n')
             elif isinstance(item, LTText):
-                self.outfp.write('<text>%s</text>\n' % item.get_text())
+                self.render_temp.append('<text>%s</text>\n' % item.get_text())
             elif isinstance(item, LTImage):
                 if self.imagewriter is not None:
                     name = self.imagewriter.export_image(item)
-                    self.outfp.write(
+                    self.render_temp.append(
                         '<image src="%s" width="%d" height="%d" />\n' %
                         (q(name), item.width, item.height))
                 else:
-                    self.outfp.write('<image width="%d" height="%d" />\n' %
-                                     (item.width, item.height))
+                    self.render_temp.append(
+                            '<image width="%d" height="%d" />\n' %
+                            (item.width, item.height))
             else:
                 assert 0, item
             return
+
         render(ltpage)
+        self.render_result += "".join(self.render_temp)
+        self.render_temp = []
         return
 
     def close(self):
+        self.outfp.write(self.render_result)
         self.write_footer()
         return
