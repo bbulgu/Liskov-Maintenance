@@ -55,9 +55,9 @@ Test that xml output is per character when the 'xml' argument is given.
 """
 
 
-def test_xml_char_no_specification(capfd):
+def test_xml_char_no_specification(capsys):
     commandline(['pdf2txt.py', '-t', 'xml', 'samples/line.pdf'])
-    out, err = capfd.readouterr()
+    out, err = capsys.readouterr()
 
     with open('samples/xml_output_line_char.txt', 'r') as file:
         data = file.read()
@@ -70,9 +70,9 @@ Test that xml output is per character when the 'xml-c' argument is given.
 """
 
 
-def test_xml_char(capfd):
+def test_xml_char(capsys):
     commandline(['pdf2txt.py', '-t', 'xml-c', 'samples/line.pdf'])
-    out, err = capfd.readouterr()
+    out, err = capsys.readouterr()
 
     with open('samples/xml_output_line_char.txt', 'r') as file:
         data = file.read()
@@ -85,9 +85,10 @@ Test that xml output is per word when the 'xml-w' argument is given.
 """
 
 
-def test_xml_word(capfd):
+def test_xml_word(capsys):
+    x, y = capsys.readouterr()
     commandline(['pdf2txt.py', '-t', 'xml-w', 'samples/line.pdf'])
-    out, err = capfd.readouterr()
+    out, err = capsys.readouterr()
 
     with open('samples/xml_output_line_word.txt', 'r') as file:
         data = file.read()
@@ -100,11 +101,31 @@ Test that xml output is per line when the 'xml-l' argument is given.
 """
 
 
-def test_xml_line(capfd):
+def test_xml_line(capsys):
     commandline(['pdf2txt.py', '-t', 'xml-l', 'samples/line.pdf'])
-    out, err = capfd.readouterr()
+    out, err = capsys.readouterr()
 
     with open('samples/xml_output_line_line.txt', 'r') as file:
+        data = file.read()
+
+    assert out == data
+
+
+def test_html(capsys):
+    commandline(['pdf2txt.py', '-t', 'html', 'samples/line.pdf'])
+    out, err = capsys.readouterr()
+
+    with open('samples/html_output.txt', 'r', encoding='utf-16') as file:
+        data = file.read()
+
+    assert out == data
+
+
+def test_tag(capsys):
+    commandline(['pdf2txt.py', '-t', 'tag', 'samples/line.pdf'])
+    out, err = capsys.readouterr()
+
+    with open('samples/tag_output.txt', 'r', encoding='utf-16') as file:
         data = file.read()
 
     assert out == data
