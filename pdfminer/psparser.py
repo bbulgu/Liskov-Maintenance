@@ -161,7 +161,6 @@ class PSBaseParser:
 
     debug = 0
 
-
     def __init__(self, fp):
         self.fp = fp
         self.seek(0)
