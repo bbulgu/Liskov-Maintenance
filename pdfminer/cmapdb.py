@@ -304,45 +304,50 @@ class CMapParser(PSStackParser):
     KEYWORD_BEGINNOTDEFRANGE = KWD(b'beginnotdefrange')
     KEYWORD_ENDNOTDEFRANGE = KWD(b'endnotdefrange')
 
-    def do_keyword(self, pos, token):
+    def check_begin_or_end(self, token):
         if token is self.KEYWORD_BEGINCMAP:
             self._in_cmap = True
             self.popall()
-            return
+            return True
         elif token is self.KEYWORD_ENDCMAP:
             self._in_cmap = False
-            return
+            return True
         if not self._in_cmap:
+            return True
+
+    def keyword_def(self):
+        try:
+            ((_, k), (_, v)) = self.pop(2)
+            self.cmap.set_attr(literal_name(k), v)
+        except PSSyntaxError:
+            pass
+        return
+
+    def keyword_usecmap(self):
+        try:
+            ((_, cmapname),) = self.pop(1)
+            self.cmap.use_cmap(CMapDB.get_cmap(literal_name(cmapname)))
+        except (PSSyntaxError, CMapDB.CMapNotFound):
+            pass
+        return
+
+    def do_keyword(self, pos, token):
+        if self.check_begin_or_end(token):
             return
         #
         if token is self.KEYWORD_DEF:
-            try:
-                ((_, k), (_, v)) = self.pop(2)
-                self.cmap.set_attr(literal_name(k), v)
-            except PSSyntaxError:
-                pass
-            return
+            self.keyword_def()
 
         if token is self.KEYWORD_USECMAP:
-            try:
-                ((_, cmapname),) = self.pop(1)
-                self.cmap.use_cmap(CMapDB.get_cmap(literal_name(cmapname)))
-            except PSSyntaxError:
-                pass
-            except CMapDB.CMapNotFound:
-                pass
-            return
+            self.keyword_usecmap()
 
-        if token is self.KEYWORD_BEGINCODESPACERANGE:
-            self.popall()
-            return
-        if token is self.KEYWORD_ENDCODESPACERANGE:
+        if token in [self.KEYWORD_BEGINCODESPACERANGE, self.KEYWORD_ENDCODESPACERANGE, 
+        self.KEYWORD_BEGINCIDRANGE, self.KEYWORD_BEGINCIDCHAR, self.KEYWORD_BEGINBFCHAR,
+        self.KEYWORD_BEGINNOTDEFRANGE, self.KEYWORD_ENDNOTDEFRANGE]:
             self.popall()
             return
 
-        if token is self.KEYWORD_BEGINCIDRANGE:
-            self.popall()
-            return
+
         if token is self.KEYWORD_ENDCIDRANGE:
             objs = [obj for (__, obj) in self.popall()]
             for (s, e, cid) in choplist(3, objs):
@@ -364,9 +369,6 @@ class CMapParser(PSStackParser):
                     self.cmap.add_code2cid(x, cid + i)
             return
 
-        if token is self.KEYWORD_BEGINCIDCHAR:
-            self.popall()
-            return
         if token is self.KEYWORD_ENDCIDCHAR:
             objs = [obj for (__, obj) in self.popall()]
             for (cid, code) in choplist(2, objs):
@@ -374,9 +376,6 @@ class CMapParser(PSStackParser):
                     self.cmap.add_code2cid(code, nunpack(cid))
             return
 
-        if token is self.KEYWORD_BEGINBFRANGE:
-            self.popall()
-            return
         if token is self.KEYWORD_ENDBFRANGE:
             objs = [obj for (__, obj) in self.popall()]
             for (s, e, code) in choplist(3, objs):
@@ -399,21 +398,11 @@ class CMapParser(PSStackParser):
                         self.cmap.add_cid2unichr(s1 + i, x)
             return
 
-        if token is self.KEYWORD_BEGINBFCHAR:
-            self.popall()
-            return
         if token is self.KEYWORD_ENDBFCHAR:
             objs = [obj for (__, obj) in self.popall()]
             for (cid, code) in choplist(2, objs):
                 if isinstance(cid, bytes) and isinstance(code, bytes):
                     self.cmap.add_cid2unichr(nunpack(cid), code)
-            return
-
-        if token is self.KEYWORD_BEGINNOTDEFRANGE:
-            self.popall()
-            return
-        if token is self.KEYWORD_ENDNOTDEFRANGE:
-            self.popall()
             return
 
         self.push((pos, token))
