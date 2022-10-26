@@ -321,7 +321,6 @@ class CMapParser(PSStackParser):
             self.cmap.set_attr(literal_name(k), v)
         except PSSyntaxError:
             pass
-        return
 
     def keyword_usecmap(self):
         try:
@@ -329,81 +328,88 @@ class CMapParser(PSStackParser):
             self.cmap.use_cmap(CMapDB.get_cmap(literal_name(cmapname)))
         except (PSSyntaxError, CMapDB.CMapNotFound):
             pass
-        return
+
+    def keyword_endbfchar(self):
+        objs = [obj for (__, obj) in self.popall()]
+        for (cid, code) in choplist(2, objs):
+            if isinstance(cid, bytes) and isinstance(code, bytes):
+                self.cmap.add_cid2unichr(nunpack(cid), code)
+
+    def keyword_endcidchar(self):
+        objs = [obj for (__, obj) in self.popall()]
+        for (cid, code) in choplist(2, objs):
+            if isinstance(code, bytes) and isinstance(cid, bytes):
+                self.cmap.add_code2cid(code, nunpack(cid))
+
+    def keyword_endbfrange(self):
+        self.keyword_endbfrange()
+        objs = [obj for (__, obj) in self.popall()]
+        for (s, e, code) in choplist(3, objs):
+            if (not isinstance(s, bytes) or
+                not isinstance(e, bytes) or len(s) != len(e)):
+                continue
+            s1 = nunpack(s)
+            e1 = nunpack(e)
+            # assert s1 <= e1
+            if isinstance(code, list):
+                for i in range(e1 - s1 + 1):
+                    self.cmap.add_cid2unichr(s1 + i, code[i])
+            else:
+                var = code[-4:]
+                base = nunpack(var)
+                prefix = code[:-4]
+                vlen = len(var)
+                for i in range(e1 - s1 + 1):
+                    x = prefix + struct.pack('>L', base + i)[-vlen:]
+                    self.cmap.add_cid2unichr(s1 + i, x)
+
+    def keyword_endcidrange(self):
+        objs = [obj for (__, obj) in self.popall()]
+        for (s, e, cid) in choplist(3, objs):
+            if (not isinstance(s, bytes) or not isinstance(e, bytes) or
+                not isinstance(cid, int) or len(s) != len(e)):
+                continue
+            sprefix = s[:-4]
+            eprefix = e[:-4]
+            if sprefix != eprefix:
+                continue
+            svar = s[-4:]
+            evar = e[-4:]
+            s1 = nunpack(svar)
+            e1 = nunpack(evar)
+            vlen = len(svar)
+            # assert s1 <= e1
+            for i in range(e1 - s1 + 1):
+                x = sprefix + struct.pack('>L', s1 + i)[-vlen:]
+                self.cmap.add_code2cid(x, cid + i)
 
     def do_keyword(self, pos, token):
         if self.check_begin_or_end(token):
             return
         #
-        if token is self.KEYWORD_DEF:
-            self.keyword_def()
+        elif token is self.KEYWORD_DEF:
+            return self.keyword_def()
 
-        if token is self.KEYWORD_USECMAP:
-            self.keyword_usecmap()
+        elif token is self.KEYWORD_USECMAP:
+            return self.keyword_usecmap()
 
-        if token in [self.KEYWORD_BEGINCODESPACERANGE, self.KEYWORD_ENDCODESPACERANGE, 
+        elif token in [self.KEYWORD_BEGINCODESPACERANGE, self.KEYWORD_ENDCODESPACERANGE, 
         self.KEYWORD_BEGINCIDRANGE, self.KEYWORD_BEGINCIDCHAR, self.KEYWORD_BEGINBFCHAR,
         self.KEYWORD_BEGINNOTDEFRANGE, self.KEYWORD_ENDNOTDEFRANGE]:
             self.popall()
             return
 
+        elif token is self.KEYWORD_ENDCIDRANGE:     
+            return self.keyword_endcidrange()
 
-        if token is self.KEYWORD_ENDCIDRANGE:
-            objs = [obj for (__, obj) in self.popall()]
-            for (s, e, cid) in choplist(3, objs):
-                if (not isinstance(s, bytes) or not isinstance(e, bytes) or
-                   not isinstance(cid, int) or len(s) != len(e)):
-                    continue
-                sprefix = s[:-4]
-                eprefix = e[:-4]
-                if sprefix != eprefix:
-                    continue
-                svar = s[-4:]
-                evar = e[-4:]
-                s1 = nunpack(svar)
-                e1 = nunpack(evar)
-                vlen = len(svar)
-                # assert s1 <= e1
-                for i in range(e1 - s1 + 1):
-                    x = sprefix + struct.pack('>L', s1 + i)[-vlen:]
-                    self.cmap.add_code2cid(x, cid + i)
-            return
+        elif token is self.KEYWORD_ENDCIDCHAR:
+            return self.keyword_endcidchar()
 
-        if token is self.KEYWORD_ENDCIDCHAR:
-            objs = [obj for (__, obj) in self.popall()]
-            for (cid, code) in choplist(2, objs):
-                if isinstance(code, bytes) and isinstance(cid, bytes):
-                    self.cmap.add_code2cid(code, nunpack(cid))
-            return
+        elif token is self.KEYWORD_ENDBFRANGE:
+            return self.keyword_endbfrange()
 
-        if token is self.KEYWORD_ENDBFRANGE:
-            objs = [obj for (__, obj) in self.popall()]
-            for (s, e, code) in choplist(3, objs):
-                if (not isinstance(s, bytes) or not isinstance(e, bytes) or
-                   len(s) != len(e)):
-                    continue
-                s1 = nunpack(s)
-                e1 = nunpack(e)
-                # assert s1 <= e1
-                if isinstance(code, list):
-                    for i in range(e1 - s1 + 1):
-                        self.cmap.add_cid2unichr(s1 + i, code[i])
-                else:
-                    var = code[-4:]
-                    base = nunpack(var)
-                    prefix = code[:-4]
-                    vlen = len(var)
-                    for i in range(e1 - s1 + 1):
-                        x = prefix + struct.pack('>L', base + i)[-vlen:]
-                        self.cmap.add_cid2unichr(s1 + i, x)
-            return
-
-        if token is self.KEYWORD_ENDBFCHAR:
-            objs = [obj for (__, obj) in self.popall()]
-            for (cid, code) in choplist(2, objs):
-                if isinstance(cid, bytes) and isinstance(code, bytes):
-                    self.cmap.add_cid2unichr(nunpack(cid), code)
-            return
+        elif token is self.KEYWORD_ENDBFCHAR:
+            return self.keyword_endbfchar()
 
         self.push((pos, token))
         return
